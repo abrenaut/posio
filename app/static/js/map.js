@@ -5,7 +5,7 @@ $(document).ready(function () {
     // Initialize world map and center it to the user position
     var map = L.map('map');
 
-    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
         maxZoom: 18,
         id: MAPBOX_ID,
@@ -25,7 +25,7 @@ $(document).ready(function () {
     }
 
     // Create socketIO connection
-    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    var socket = io.connect('//' + document.domain + ':' + location.port);
 
     // Send user location to the server once he accepts geo location
     function onLocationFound(e) {
