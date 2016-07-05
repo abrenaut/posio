@@ -30,6 +30,7 @@ $(document).ready(function () {
     // Send user location to the server once he accepts geo location
     function onLocationFound(e) {
         socket.emit('send_pos', e.latlng.lat, e.latlng.lng, e.timestamp, fp);
+        // Display user location
         L.marker([e.latlng.lat, e.latlng.lng]).addTo(map).bindPopup("<b>This is you</b>.").openPopup();
     }
 
