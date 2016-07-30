@@ -2,10 +2,9 @@
 
 from flask import render_template
 from app import app, socketio
-from .gis import store_pos, pos, position_update_task
-from flask_socketio import emit
+from .game_master import game_master_task, store_answer
 
-task = None
+game_master = None
 
 
 @app.route('/')
@@ -20,16 +19,13 @@ def render_map():
 def handle_connect():
     app.logger.info('New client')
 
-    # Start the position update task once a user is connected
-    global task
-    if not task:
-        task = socketio.start_background_task(target=position_update_task)
-
-    # Send known positions to the user to initialize his map
-    emit('init_pos', {'pos': [pos[fp] for fp in pos]})
+    # Start the game master a user is connected
+    global game_master
+    if not game_master:
+        game_master = socketio.start_background_task(target=game_master_task)
 
 
-@socketio.on('send_pos')
-def handle_send_pos(lat, lng, timestamp, fp):
-    # Store new user position
-    store_pos(lat, lng, timestamp, fp)
+@socketio.on('answer')
+def handle_answer(uuid, lat, lng):
+    # Store new answer
+    store_answer(uuid, lat, lng)
