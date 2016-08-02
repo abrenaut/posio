@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from os import environ
 from flask import Flask
 from flask_socketio import SocketIO
 from logging.handlers import RotatingFileHandler
 
 app = Flask(__name__)
 app.config.from_object('config')
-app.config.from_envvar('POSIO_SETTINGS')
+# Override config if needed
+if 'POSIO_SETTINGS' in environ:
+    app.config.from_envvar('POSIO_SETTINGS')
 
 socketio = SocketIO(app)
 
