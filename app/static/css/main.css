@@ -1,0 +1,31 @@
+body {
+    margin: 0 auto;
+    max-width: 60em;
+    font-family: "Helvetica", "Arial", sans-serif;
+    line-height: 1.5;
+    padding: 4em 1em;
+    color: #555;
+}
+
+html, body, #map {
+    height: 90%;
+}
+
+.progress {
+    height: 10px;
+}
+
+.progress > svg {
+    height: 100%;
+    display: block;
+}
+
+#game_rules {
+    color: #333;
+    height: 2em;
+    text-align: center;
+}
+
+.city {
+    color: #e81c4f;
+}

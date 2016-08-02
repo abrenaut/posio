@@ -3,20 +3,20 @@
 
 <head>
     <link href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" rel="stylesheet"/>
-    <link href="/static/css/map.css" rel="stylesheet">
+    <link href="/static/css/main.css" rel="stylesheet">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
+    <script src="//cdn.rawgit.com/kimmobrunfeldt/progressbar.js/1.0.1/dist/progressbar.min.js"></script>
     <script type="text/javascript">
-        var MAPBOX_ID = '{{ MAPBOX_ID }}';
-        var MAPBOX_TOKEN = '{{ MAPBOX_TOKEN }}';
+        var ANSWER_DURATION = {{ ANSWER_DURATION }};
     </script>
-    <script src="/static/js/map.js"></script>
+    <script src="/static/js/main.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 </head>
 
 <body>
+
 
 <div id="game_rules">Waiting for the next turn</div>
 <div id="map"></div>

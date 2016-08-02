@@ -32,22 +32,30 @@ function createUUID() {
 
 function createMap() {
 
-    var map = L.map('map');
+    var map = L.map('map', {
+        layers: [
+            L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}.{ext}', {
+                attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                noWrap: true,
+                ext: 'png'
+            })],
+        zoom: 2,
+        maxZoom: 2,
+        minZoom: 2,
+        zoomControl: false,
+        center: [49, 2.5],
+        maxBounds: [
+            [-70.0, -180.0],
+            [85.0, 180.0]
+        ]
 
-    L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-        maxZoom: 3,
-        id: MAPBOX_ID,
-        noWrap: true,
-        accessToken: MAPBOX_TOKEN
-    }).addTo(map);
+    });
 
-    map.fitWorld().zoomIn().zoomIn();
     map.touchZoom.disable();
     map.doubleClickZoom.disable();
     map.scrollWheelZoom.disable();
 
-    $('.leaflet-container').css('cursor','crosshair');
+    $('.leaflet-container').css('cursor', 'crosshair');
 
     return map;
 
@@ -77,7 +85,9 @@ function answer(e) {
 
 function newTurn(data) {
     // Update game rules
-    $('#game_rules').text('Locate ' + data.city + ' (' + data.country + ')');
+    $('#game_rules').html('Locate ' + data.city + ' (' + data.country + ')<div id="progress" class="progress"></div>');
+    // Show countdown timer
+    showCountdownTimer('#progress', ANSWER_DURATION);
     // Clear potential markers from previous turn
     assetLayer.clearLayers();
     // Enable answers for this turn
@@ -97,6 +107,10 @@ function endTurn(data) {
         // Show correct location on the map
         var correctAnswerMarker = L.marker([data.correct.lat, data.correct.lng]).addTo(map);
         assetLayer.addLayer(correctAnswerMarker);
+    } else {
+
+        $('#game_rules').html('No answer given');
+
     }
 }
 
@@ -110,4 +124,12 @@ function distance(lat1, lon1, lat2, lon2) {
     dist = dist * 180 / Math.PI;
     dist = dist * 60 * 1.1515 * 1.609344;
     return dist;
+}
+
+function showCountdownTimer(container, duration) {
+    var progressbar = new ProgressBar.Line(container, {
+        color: '#FCB03C',
+        duration: duration * 1000
+    });
+    progressbar.animate(1);
 }

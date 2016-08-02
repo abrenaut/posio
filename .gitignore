@@ -88,6 +88,5 @@ ENV/
 # Rope project settings
 .ropeproject
 
-# App config
-config.py
-
+# Test config
+test_config.py

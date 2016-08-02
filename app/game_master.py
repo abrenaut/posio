@@ -1,32 +1,38 @@
 # -*- coding: utf-8 -*-
 
 from app import socketio, app
-from posio.game import PosioGame
+from posio.game import GameTurn
 from posio.city import get_random_city
 
-game = PosioGame()
 
+class GameMaster:
+    def __init__(self):
+        self.current_turn = None
 
-def game_master_task():
-    app.logger.info('Game master started')
+    def start(self):
+        app.logger.info('Game master started')
+        socketio.start_background_task(target=self.task)
 
-    while True:
-        app.logger.info('Starting new turn')
+    def task(self):
 
-        game.start_turn()
+        while True:
+            app.logger.info('Starting new turn')
 
-        city = get_random_city()
+            self.current_turn = GameTurn()
 
-        socketio.emit('new_turn', {'city': city.name, 'country': city.country})
+            city = get_random_city()
 
-        socketio.sleep(5)
+            socketio.emit('new_turn', {'city': city.name, 'country': city.country, 'country_code': city.country})
 
-        app.logger.info('Ending turn')
+            socketio.sleep(app.config.get('ANSWER_DURATION'))
 
-        socketio.emit('end_of_turn', {'answers': game.answers, 'correct': {'lat': city.lat, 'lng': city.lng}})
+            app.logger.info('Ending turn')
 
-        socketio.sleep(5)
+            socketio.emit('end_of_turn',
+                          {'answers': self.current_turn.answers, 'correct': {'lat': city.lat, 'lng': city.lng}})
 
+            socketio.sleep(app.config.get('RESULT_DURATION'))
 
-def store_answer(uuid, lat, lng):
-    game.store_answer(uuid, lat, lng)
+    def store_answer(self, uuid, lat, lng):
+        if self.current_turn:
+            self.current_turn.store_answer(uuid, lat, lng)
