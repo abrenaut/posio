@@ -1,8 +1,10 @@
 # Posio
 
-Show visitors geolocation on a leaflet map and update them using Flask-SocketIO.
+A multiplayer geography game written using Flask-SocketIO.
 
-Visit [https://map.abrenaut.com/](https://map.abrenaut.com/) for a live demo.
+Locate cities on a map and compete with other players to get the best answers. 
+
+Visit [https://posio.abrenaut.com/](https://posio.abrenaut.com/) for a live demo.
     
 ## Developing
 
@@ -15,18 +17,10 @@ To download dependencies:
     
     python setup.py install
     
-Mapbox tokens are stored in a config.py file in the root folder. Example config.py file:
+To override the configuration:
     
-    DEBUG = True    
-    MAPBOX_TOKEN = 'token'
-    MAPBOX_ID = 'id'
-
+    export POSIO_SETTINGS=/path/to/config.py
    
 To run the application :
     
     python run.py
-
-## Features
-
-* Show your location and the one of other users on a leaflet map
-* Send updates to users location through a web socket
