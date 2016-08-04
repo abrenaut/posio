@@ -13,21 +13,19 @@ class City:
         self.lng = lng
 
 
-def get_random_city():
+def get_cities():
     # Connect to the city database
     conn = sqlite3.connect(os.path.join(dir_path, '../data/cities.db'))
 
-    # Select a random city
+    # Select every cities in random order
     c = conn.cursor()
 
-    c.execute('SELECT * FROM cities ORDER BY RANDOM() LIMIT 1;')
-
-    city_data = c.fetchone()
-
-    # Create a City
-    city = City(city_data[0], city_data[1], city_data[2], city_data[3])
+    cities = []
+    for city_data in c.execute('SELECT * FROM cities ORDER BY RANDOM()'):
+        # Create City objects
+        cities.append(City(city_data[0], city_data[1], city_data[2], city_data[3]))
 
     # Close connection
     conn.close()
 
-    return city
+    return cities

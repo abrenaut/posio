@@ -1,8 +1,6 @@
 # Posio
 
-A multiplayer geography game written using Flask-SocketIO.
-
-Locate cities on a map and compete with other players to get the best answers. 
+A multiplayer geography game using Websockets.
 
 Visit [https://posio.abrenaut.com/](https://posio.abrenaut.com/) for a live demo.
     

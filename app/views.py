@@ -8,9 +8,9 @@ game_master = None
 
 
 @app.route('/')
-@app.route('/map')
+@app.route('/game')
 def render_map():
-    return render_template('map.html', ANSWER_DURATION=app.config.get('ANSWER_DURATION'))
+    return render_template('game.html', ANSWER_DURATION=app.config.get('ANSWER_DURATION'))
 
 
 @socketio.on('connect')

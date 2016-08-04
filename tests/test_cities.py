@@ -1,11 +1,11 @@
 # coding: utf8
 import unittest
 
-from posio.city import get_random_city
+from posio.city import get_cities
 
 
-class TestNetworkWS(unittest.TestCase):
+class TestCity(unittest.TestCase):
     def test_get_random_city(self):
-        # Check that a random city is returned
-        city = get_random_city()
-        self.assertIsNotNone(city)
+        # Check that a list of cities is returned
+        cities = get_cities()
+        self.assertTrue(len(cities) > 0)
