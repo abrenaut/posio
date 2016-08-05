@@ -1,8 +1,7 @@
 var uuid = null,
     map = null,
     markerGroup = null,
-    socket = null,
-    started = false;
+    socket = null;
 
 $(document).ready(function () {
 
@@ -12,11 +11,11 @@ $(document).ready(function () {
     // Create the leaflet map
     map = createMap();
 
-    // Create the web socket
-    socket = io.connect('//' + document.domain + ':' + location.port);
-
     // Create the marker group used to clear markers between turns
     markerGroup = new L.LayerGroup().addTo(map);
+
+    // Create the web socket
+    socket = io.connect('//' + document.domain + ':' + location.port);
 
     // Handle new turn
     socket.on('new_turn', newTurn);
@@ -81,9 +80,6 @@ function createMap() {
 
 function newTurn(data) {
 
-    // Update the started flag
-    started = true;
-
     // Clear potential markers from previous turn
     markerGroup.clearLayers();
 
@@ -109,50 +105,36 @@ function endTurn(data) {
     // Clear markers
     markerGroup.clearLayers();
 
-    // Update game rules
-    $('#game_rules').html('Waiting for the next turn');
-
-    // Get rankings and show answers
-    var bestAnswer = null;
-
-    // Get the distance between each answer and the city to find
-    for (var answerUuid in data.answers) {
-
-        data.answers[answerUuid].distance = distance(data.correct.lat, data.correct.lng, data.answers[answerUuid].lat, data.answers[answerUuid].lng);
-
-        // Update best answer
-        bestAnswer = (!bestAnswer || data.answers[answerUuid].distance < bestAnswer.distance) ? data.answers[answerUuid] : bestAnswer;
-
-    }
-
-    // Sort answers in order to get user ranking
-    var answersSorted = Object.keys(data.answers).sort(function (a, b) {
-        return data.answers[a].distance - data.answers[b].distance
-    })
-
     // Show best answer
-    if (bestAnswer) {
+    if (data.answers.length > 0) {
 
-        var bestAnswerDistanceRounded = Math.round(bestAnswer.distance * 100) / 100;
-        var marker = createMarker(bestAnswer.lat, bestAnswer.lng, 'green');
-        addPopup(marker, 'Closest answer (<b>' + bestAnswerDistanceRounded + ' km</b> away)', false);
+        var bestAnswer = data.answers[0];
+
+        var bestMarker = createMarker(bestAnswer.lat, bestAnswer.lng, 'green');
+        bestMarker.bindPopup('Closest answer (<b>' + round(bestAnswer.distance) + ' km</b> away)');
 
     }
 
     // Show correct answer
-    var marker = createMarker(data.correct.lat, data.correct.lng, 'red');
-    addPopup(marker, data.correct.name, false);
+    var correctMarker = createMarker(data.correct.lat, data.correct.lng, 'red');
+    correctMarker.bindPopup(data.correct.name);
 
-    // Show user answer and ranking
-    if (uuid in data.answers) {
+    // Search user answer and display it
+    var answerLength = data.answers.length;
+    for (var i = 0; i < answerLength; i++) {
 
-        var userDistanceRounded = Math.round(data.answers[uuid].distance * 100) / 100;
-        var userRanking = answersSorted.indexOf(uuid) + 1;
+        if (data.answers[i].uuid == uuid) {
 
-        var marker = createMarker(data.answers[uuid].lat, data.answers[uuid].lng, 'blue');
-        addPopup(marker, 'Your are <b>#' + userRanking + '</b> out of <b>' + answersSorted.length + '</b> player(s) (<b>' + userDistanceRounded + ' km</b> away)', true);
+            var userMarker = createMarker(data.answers[i].lat, data.answers[i].lng, 'blue');
+            userMarker.bindPopup('Your are <b>#' + (i + 1) + '</b> out of <b>' + answerLength + '</b> player(s) (<b>' + round(data.answers[i].distance) + ' km</b> away)').openPopup();
+            break;
+
+        }
 
     }
+
+    // Update game rules
+    $('#game_rules').html('Waiting for the next turn');
 
 }
 
@@ -186,16 +168,6 @@ function createMarker(lat, lng, color) {
 
 }
 
-function addPopup(marker, text, openPopup) {
-
-    var popup = marker.bindPopup(text);
-
-    if (openPopup) {
-        popup.openPopup()
-    }
-
-}
-
 function showCountdownTimer(container, duration) {
 
     var progressbar = new ProgressBar.Line(container, {
@@ -207,18 +179,6 @@ function showCountdownTimer(container, duration) {
 
 }
 
-function distance(lat1, lon1, lat2, lon2) {
-
-    var radlat1 = Math.PI * lat1 / 180;
-    var radlat2 = Math.PI * lat2 / 180;
-    var theta = lon1 - lon2;
-    var radtheta = Math.PI * theta / 180;
-    var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-    dist = Math.acos(dist);
-    dist = dist * 180 / Math.PI;
-    dist = dist * 60 * 1.1515 * 1.609344;
-
-    return dist;
-
+function round(value) {
+    return Math.round(value * 100) / 100
 }
-
