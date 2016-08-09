@@ -21,6 +21,14 @@ html, body, #map {
     color: #e81c4f;
 }
 
+.results {
+    text-align: center;
+}
+
+.score {
+    color: #e81c4f;
+}
+
 .legend {
     line-height: 18px;
     color: #555;

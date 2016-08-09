@@ -14,10 +14,11 @@ DISTANCE_PER_DEGREE = (2 * pi * EARTH_EQUATOR) / (360 * 1000)
 
 
 class PosioGame:
-    def __init__(self):
+    def __init__(self, score_max_distance):
         self.cities = self.get_cities()
         self.answers = []
         self.turn_number = 0
+        self.score_max_distance = score_max_distance
 
     def current_city(self):
         # Return a different city for each turn
@@ -48,10 +49,9 @@ class PosioGame:
     def ranked_answers(self):
         return sorted(self.answers, key=lambda answer: answer['score'], reverse=True)
 
-    @staticmethod
-    def score(distance):
+    def score(self, distance):
         # Convert distance to a score
-        score = round(1000 - distance)
+        score = round(self.score_max_distance - distance)
 
         return max(0, score)
 

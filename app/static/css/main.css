@@ -7,3 +7,13 @@ body {
     color: #555;
 }
 
+h2 {
+    margin-top: 1em;
+    padding-top: 1em;
+    text-align: center;
+}
+
+h2,
+strong {
+    color: #333;
+}

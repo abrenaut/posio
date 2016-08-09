@@ -126,7 +126,25 @@ function endTurn(data) {
         if (data.answers[i].uuid == uuid) {
 
             var userMarker = createMarker(data.answers[i].lat, data.answers[i].lng, 'blue');
-            userMarker.bindPopup('Your are <b>#' + (i + 1) + '</b> out of <b>' + answerLength + '</b> player(s) (<b>' + round(data.answers[i].distance) + ' km</b> away)').openPopup();
+
+            // Show user score, ranking and distance
+            var resultsText = '<div class="results"><b>' + round(data.answers[i].distance) + ' km</b> away: ';
+
+            if (data.answers[i].score == 0) {
+                resultsText += '<span class="score">Too far away!</span>';
+            } else {
+                resultsText += '<span class="score">+<span id="score_value">0</span> points</span>';
+            }
+
+            resultsText += '<br/>Your are <b>#' + (i + 1) + '</b> out of <b>' + answerLength + '</b> player(s)</div>';
+
+            userMarker.bindPopup(resultsText).openPopup();
+
+            if (data.answers[i].score != 0) {
+                // Animate user score
+                animateScore(data.answers[i].score);
+            }
+
             break;
 
         }
@@ -181,4 +199,33 @@ function showCountdownTimer(container, duration) {
 
 function round(value) {
     return Math.round(value * 100) / 100
+}
+
+function animateScore(score) {
+    var duration = 1000;
+    // no timer shorter than 50ms (not really visible any way)
+    var minTimer = 50;
+    // calc step time to show all interediate values
+    var stepTime = Math.abs(Math.floor(duration / score));
+
+    // never go below minTimer
+    stepTime = Math.max(stepTime, minTimer);
+
+    // get current time and calculate desired end time
+    var startTime = new Date().getTime();
+    var endTime = startTime + duration;
+    var timer;
+
+    function run() {
+        var now = new Date().getTime();
+        var remaining = Math.max((endTime - now) / duration, 0);
+        var value = Math.round(score - (remaining * score));
+        $('#score_value').text(value);
+        if (value == score) {
+            clearInterval(timer);
+        }
+    }
+
+    timer = setInterval(run, stepTime);
+    run();
 }

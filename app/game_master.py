@@ -6,7 +6,7 @@ from posio.game import PosioGame
 
 class GameMaster:
     def __init__(self):
-        self.game = PosioGame()
+        self.game = PosioGame(app.config.get('SCORE_MAX_DISTANCE'))
 
     def start(self):
         app.logger.info('Game master started')

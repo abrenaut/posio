@@ -7,7 +7,7 @@ from posio.game import PosioGame
 class TestGame(unittest.TestCase):
     def test_get_current_city(self):
         # Check that when a new turn is started the current city changes
-        game = PosioGame()
+        game = PosioGame(1000)
 
         game.new_turn()
         city1 = game.current_city()
@@ -19,13 +19,12 @@ class TestGame(unittest.TestCase):
 
     def test_get_cities(self):
         # Check that a list of cities is returned
-        game = PosioGame()
-        cities = game.get_cities()
+        cities = PosioGame.get_cities()
         self.assertTrue(len(cities) > 0)
 
     def test_distance(self):
         # Test the distance function
-        game = PosioGame()
+        game = PosioGame(1000)
 
         # Exact match
         distance = game.plane_distance(48.3515609, -1.204625999999962, 48.3515609, -1.204625999999962)
@@ -41,7 +40,7 @@ class TestGame(unittest.TestCase):
 
     def test_score(self):
         # Test the scoring function
-        game = PosioGame()
+        game = PosioGame(1000)
 
         # Exact match
         score = game.score(0)
@@ -57,7 +56,7 @@ class TestGame(unittest.TestCase):
 
     def test_ranked_answer(self):
         # Test the ranking function
-        game = PosioGame()
+        game = PosioGame(1000)
 
         # Mock the get_current_city function to always return the same city
         game.current_city = lambda: {
