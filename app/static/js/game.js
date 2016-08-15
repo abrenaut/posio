@@ -1,35 +1,40 @@
 var uuid = null,
     map = null,
     markerGroup = null,
-    socket = null;
+    socket = null,
+    progressbar = null,
+    game_id = 'default';
 
 $(document).ready(function () {
 
-    // Create a unique ID to identify user answers
-    uuid = createUUID();
+    // Get the unique ID which identifies user answers
+    uuid = getCookieValue(USER_ID_COOKIE);
 
-    // Create the leaflet map
-    map = createMap();
+    // If user is identified, start the game
+    if (uuid) {
 
-    // Create the marker group used to clear markers between turns
-    markerGroup = new L.LayerGroup().addTo(map);
+        // Create the leaflet map
+        map = createMap();
 
-    // Create the web socket
-    socket = io.connect('//' + document.domain + ':' + location.port);
+        // Create the marker group used to clear markers between turns
+        markerGroup = new L.LayerGroup().addTo(map);
 
-    // Handle new turn
-    socket.on('new_turn', newTurn);
+        // Create the web socket
+        socket = io.connect('//' + document.domain + ':' + location.port);
+
+        // Handle new turn
+        socket.on('new_turn', newTurn);
+
+        // Handle leaderboard update
+        socket.on('leaderboard_update', updateLeaderboard);
+
+        // Join the default game
+        socket.emit('join', game_id);
+
+    }
 
 });
 
-function createUUID() {
-
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-
-}
 
 function createMap() {
 
@@ -75,6 +80,28 @@ function createMap() {
     legend.addTo(map);
 
     return map;
+
+}
+
+function updateLeaderboard(data) {
+
+    var player_count = data.scores.length;
+
+    $('.score_row').remove();
+
+    for (var i = 0; i < player_count; i++) {
+
+        if (data.scores[i].uuid == uuid) {
+
+            $('#leaderboard tr:last').after('<tr class="score_row user_score"><td>' + (i + 1) + '</td><td>You</td><td>' + data.scores[i].score + '</td></tr>');
+
+        } else if (i < 10) {
+
+            $('#leaderboard tr:last').after('<tr class="score_row"><td>' + (i + 1) + '</td><td>' + data.scores[i].name + '</td><td>' + data.scores[i].score + '</td></tr>');
+
+        }
+
+    }
 
 }
 
@@ -165,7 +192,7 @@ function answer(e) {
     createMarker(e.latlng.lat, e.latlng.lng, 'blue');
 
     // Emit answer event
-    socket.emit('answer', uuid, e.latlng.lat, e.latlng.lng);
+    socket.emit('answer', game_id, uuid, e.latlng.lat, e.latlng.lng);
 
 }
 
@@ -188,7 +215,7 @@ function createMarker(lat, lng, color) {
 
 function showCountdownTimer(container, duration) {
 
-    var progressbar = new ProgressBar.Line(container, {
+    progressbar = new ProgressBar.Line(container, {
         color: '#FCB03C',
         duration: duration * 1000
     });
@@ -228,4 +255,9 @@ function animateScore(score) {
 
     timer = setInterval(run, stepTime);
     run();
+}
+
+function getCookieValue(name) {
+    var value = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return value ? value.pop() : '';
 }

@@ -22,3 +22,10 @@ To override the configuration:
 To run the application :
     
     python run.py
+
+# TODO
+
+login 
+leaderboard
+design
+use resp time in score

@@ -9,6 +9,7 @@
     <script src="//cdn.rawgit.com/kimmobrunfeldt/progressbar.js/1.0.1/dist/progressbar.min.js"></script>
     <script type="text/javascript">
         var ANSWER_DURATION = {{ ANSWER_DURATION }};
+        var USER_ID_COOKIE = '{{ USER_ID_COOKIE }}';
     </script>
     <script src="/static/js/game.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
@@ -22,9 +23,22 @@
 
     <div id="game_rules">You'll be given a list of cities that you must locate by clicking on the map</div>
     <div id="map"></div>
-    <h2>Leaderboard</h2>
-    <div id="leaderboard">
 
-    </div>
+    <h2>Leaderboard</h2>
+
+
+    <table id="leaderboard">
+        <tr>
+            <th>
+                Rank
+            </th>
+            <th>
+                Player
+            </th>
+            <th>
+                Score
+            </th>
+        </tr>
+    </table>
 
 {% endblock %}

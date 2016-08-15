@@ -73,3 +73,25 @@ class TestGame(unittest.TestCase):
         self.assertEquals(ranked_answers[0]['uuid'], 'a')
         self.assertEquals(ranked_answers[1]['uuid'], 'b')
         self.assertEquals(ranked_answers[2]['uuid'], 'c')
+
+    def test_get_ranked_scores(self):
+        # Test the ranking function
+        game = PosioGame(1000)
+
+        # Mock the get_current_city function to always return the same city
+        game.current_city = lambda: {
+            'latitude': 48.3515609,
+            'longitude': -1.204625999999962
+        }
+
+        # Always return the correct answer for player a, a close answer for c and an answer far away for b
+        for i in range(0, 30):
+            game.new_turn()
+            game.store_answer('a', 48.3515609, -1.204625999999962)
+            game.store_answer('b', 0, 0)
+            game.store_answer('c', 48.370431, -1.151591000000053)
+
+        self.assertEquals(game.get_ranked_scores(),
+                          [{'score': 20000.0, 'uuid': 'a'}, {'score': 19880.0, 'uuid': 'c'}, {'score': 0, 'uuid': 'b'}])
+        # Max score shouldn't be higher than 20000 because we limit to 20 turns to compute score
+        self.assertEquals(game.get_ranked_scores()[0]['score'], 20000)
