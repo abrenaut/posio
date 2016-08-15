@@ -18,65 +18,73 @@ class PosioGame:
         self.game_id = game_id
         self.score_max_distance = score_max_distance
         self.cities = self.get_cities()
+        self.players = {}
         self.answers = []
         self.turn_number = 0
-        self.scores_by_turn = {self.turn_number: {}}
 
-    def current_city(self):
-        # Return a different city for each turn
-        return self.cities[self.turn_number % len(self.cities)]
+    def add_player(self, player_sid, player_name):
+        self.players[player_sid] = {
+            'name': player_name,
+            'scores': {}
+        }
 
-    def new_turn(self):
-        # Reset answers
+    def remove_player(self, player_sid):
+        self.players.pop(player_sid, None)
+
+    def start_new_turn(self):
+        # Reset answers for this turn
         self.answers = []
 
         # Update turn number
         self.turn_number += 1
 
-        # Create the dictionary where this turn scores will be stored
-        self.scores_by_turn[self.turn_number] = {}
-
-        # Only keep the scores for the last 20 turns
-        for turn in [turn for turn in self.scores_by_turn if turn <= self.turn_number - 20]:
-            self.scores_by_turn.pop(turn)
-
-    def store_answer(self, uuid, latitude, longitude):
-        # Get the distance between user answer and correct answer
-        current_city = self.current_city()
+    def store_answer(self, player_sid, latitude, longitude):
+        # Get the distance between player answer and correct answer
+        current_city = self.get_current_city()
         distance = self.plane_distance(current_city['latitude'], current_city['longitude'], latitude, longitude)
 
         score = self.score(distance)
 
-        self.scores_by_turn[self.turn_number][uuid] = score
-
         self.answers.append({
-            'uuid': uuid,
-            'lat': latitude,
-            'lng': longitude,
+            'sid': player_sid,
+            'latitude': latitude,
+            'longitude': longitude,
             'score': score,
             'distance': distance
         })
 
-    def ranked_answers(self):
+        self.get_player(player_sid)['scores'][self.turn_number] = score
+
+    def get_current_city(self):
+        # Return a different city for each turn
+        return self.cities[self.turn_number % len(self.cities)]
+
+    def get_ranked_answers(self):
         return sorted(self.answers, key=lambda answer: answer['score'], reverse=True)
+
+    def get_ranked_scores(self):
+        scores_by_player = {}
+
+        for player_sid in self.players:
+            # Compute the player score for the last 20 turns
+            score = 0
+
+            for previous_turn in range(self.turn_number - 19, self.turn_number + 1):
+                score += self.players[player_sid]['scores'].get(previous_turn, 0)
+
+            # Store the score
+            scores_by_player[player_sid] = score
+
+        ranked_scores = [{'sid': sid, 'score': scores_by_player[sid]} for sid in
+                         sorted(scores_by_player, key=lambda sid: scores_by_player[sid], reverse=True)]
+
+        return ranked_scores
 
     def score(self, distance):
         # Convert distance to a score
         score = round(self.score_max_distance - distance)
 
         return max(0, score)
-
-    def get_ranked_scores(self):
-        scores_by_user = {}
-
-        for turn, scores in self.scores_by_turn.iteritems():
-            for uuid, score in scores.iteritems():
-                scores_by_user[uuid] = scores_by_user.get(uuid, 0) + score
-
-        ranked_scores = [{'uuid': uuid, 'score': scores_by_user[uuid]} for uuid in
-                         sorted(scores_by_user, key=lambda uuid: scores_by_user[uuid], reverse=True)]
-
-        return ranked_scores
 
     @staticmethod
     def get_cities():
@@ -106,3 +114,8 @@ class PosioGame:
         px = longitude2 - longitude1
         py = latitude2 - latitude1
         return sqrt(px * px + py * py) * DISTANCE_PER_DEGREE
+
+    def get_player(self, player_sid):
+        if player_sid not in self.players:
+            self.add_player(player_sid, 'Unknown')
+        return self.players[player_sid]

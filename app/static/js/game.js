@@ -1,40 +1,38 @@
-var uuid = null,
+var playerName = 'Arthur',
     map = null,
     markerGroup = null,
     socket = null,
     progressbar = null,
-    game_id = 'default';
+    gameId = 'default';
 
 $(document).ready(function () {
 
-    // Get the unique ID which identifies user answers
-    uuid = getCookieValue(USER_ID_COOKIE);
+    // Create the leaflet map
+    map = createMap();
 
-    // If user is identified, start the game
-    if (uuid) {
+    // Create the marker group used to clear markers between turns
+    markerGroup = new L.LayerGroup().addTo(map);
 
-        // Create the leaflet map
-        map = createMap();
-
-        // Create the marker group used to clear markers between turns
-        markerGroup = new L.LayerGroup().addTo(map);
-
-        // Create the web socket
-        socket = io.connect('//' + document.domain + ':' + location.port);
-
-        // Handle new turn
-        socket.on('new_turn', newTurn);
-
-        // Handle leaderboard update
-        socket.on('leaderboard_update', updateLeaderboard);
-
-        // Join the default game
-        socket.emit('join', game_id);
-
-    }
+    // Join the game
+    joinGame();
 
 });
 
+function joinGame() {
+
+    // Create the web socket
+    socket = io.connect('//' + document.domain + ':' + location.port);
+
+    // Handle new turn
+    socket.on('new_turn', handleNewTurn);
+
+    // Handle leaderboard update
+    socket.on('leaderboard_update', updateLeaderboard);
+
+    // Join the default game
+    socket.emit('join_game', gameId, playerName);
+
+}
 
 function createMap() {
 
@@ -64,8 +62,6 @@ function createMap() {
     map.doubleClickZoom.disable();
     map.scrollWheelZoom.disable();
 
-    $('.leaflet-container').css('cursor', 'crosshair');
-
     // Add a legend to the map
     var legend = L.control({position: 'bottomleft'});
 
@@ -85,19 +81,17 @@ function createMap() {
 
 function updateLeaderboard(data) {
 
-    var player_count = data.scores.length;
-
     $('.score_row').remove();
 
-    for (var i = 0; i < player_count; i++) {
+    for (var i = 0; i < 10; i++) {
 
-        if (data.scores[i].uuid == uuid) {
+        if (data.player_rank == i) {
 
-            $('#leaderboard tr:last').after('<tr class="score_row user_score"><td>' + (i + 1) + '</td><td>You</td><td>' + data.scores[i].score + '</td></tr>');
+            $('#leaderboard tr:last').after('<tr class="score_row user_score"><td>' + (i + 1) + '</td><td>You</td><td>' + data.player_score + '</td></tr>');
 
-        } else if (i < 10) {
+        } else if(data.top_ten[i]) {
 
-            $('#leaderboard tr:last').after('<tr class="score_row"><td>' + (i + 1) + '</td><td>' + data.scores[i].name + '</td><td>' + data.scores[i].score + '</td></tr>');
+            $('#leaderboard tr:last').after('<tr class="score_row"><td>' + (i + 1) + '</td><td>' + data.top_ten[i].player_name + '</td><td>' + data.top_ten[i].score + '</td></tr>');
 
         }
 
@@ -105,7 +99,7 @@ function updateLeaderboard(data) {
 
 }
 
-function newTurn(data) {
+function handleNewTurn(data) {
 
     // Clear potential markers from previous turn
     markerGroup.clearLayers();
@@ -120,11 +114,14 @@ function newTurn(data) {
     map.on('click', answer);
 
     // Handle end of turn
-    socket.on('end_of_turn', endTurn);
+    socket.on('end_of_turn', handleEndOfTurn);
+
+    // Handle player results
+    socket.on('player_results', showPlayerResults);
 
 }
 
-function endTurn(data) {
+function handleEndOfTurn(data) {
 
     // Disable answers listener
     map.off('click', answer);
@@ -132,54 +129,44 @@ function endTurn(data) {
     // Clear markers
     markerGroup.clearLayers();
 
-    // Show best answer
-    if (data.answers.length > 0) {
+    // Show best answer if there is one
+    if (data.best_answer) {
 
-        var bestAnswer = data.answers[0];
-
-        var bestMarker = createMarker(bestAnswer.lat, bestAnswer.lng, 'green');
-        bestMarker.bindPopup('Closest answer (<b>' + round(bestAnswer.distance) + ' km</b> away)');
+        var bestMarker = createMarker(data.best_answer.lat, data.best_answer.lng, 'green');
+        bestMarker.bindPopup('Closest answer (<b>' + round(data.best_answer.distance) + ' km</b> away)');
 
     }
 
     // Show correct answer
-    var correctMarker = createMarker(data.correct.lat, data.correct.lng, 'red');
-    correctMarker.bindPopup(data.correct.name);
-
-    // Search user answer and display it
-    var answerLength = data.answers.length;
-    for (var i = 0; i < answerLength; i++) {
-
-        if (data.answers[i].uuid == uuid) {
-
-            var userMarker = createMarker(data.answers[i].lat, data.answers[i].lng, 'blue');
-
-            // Show user score, ranking and distance
-            var resultsText = '<div class="results"><b>' + round(data.answers[i].distance) + ' km</b> away: ';
-
-            if (data.answers[i].score == 0) {
-                resultsText += '<span class="score">Too far away!</span>';
-            } else {
-                resultsText += '<span class="score">+<span id="score_value">0</span> points</span>';
-            }
-
-            resultsText += '<br/>Your are <b>#' + (i + 1) + '</b> out of <b>' + answerLength + '</b> player(s)</div>';
-
-            userMarker.bindPopup(resultsText).openPopup();
-
-            if (data.answers[i].score != 0) {
-                // Animate user score
-                animateScore(data.answers[i].score);
-            }
-
-            break;
-
-        }
-
-    }
+    var correctMarker = createMarker(data.correct_answer.lat, data.correct_answer.lng, 'red');
+    correctMarker.bindPopup(data.correct_answer.name);
 
     // Update game rules
     $('#game_rules').html('Waiting for the next turn');
+
+}
+
+function showPlayerResults(data) {
+
+    var userMarker = createMarker(data.lat, data.lng, 'blue');
+
+    // Show user score, ranking and distance
+    var resultsText = '<div class="results"><b>' + round(data.distance) + ' km</b> away: ';
+
+    if (data.score == 0) {
+        resultsText += '<span class="score">Too far away!</span>';
+    } else {
+        resultsText += '<span class="score">+<span id="score_value">0</span> points</span>';
+    }
+
+    resultsText += '<br/>Your are <b>#' + data.rank + '</b> out of <b>' + data.total + '</b> player(s)</div>';
+
+    userMarker.bindPopup(resultsText).openPopup();
+
+    if (data.score != 0) {
+        // Animate user score
+        animateScore(data.score);
+    }
 
 }
 
@@ -192,7 +179,7 @@ function answer(e) {
     createMarker(e.latlng.lat, e.latlng.lng, 'blue');
 
     // Emit answer event
-    socket.emit('answer', game_id, uuid, e.latlng.lat, e.latlng.lng);
+    socket.emit('answer', gameId, e.latlng.lat, e.latlng.lng);
 
 }
 
@@ -255,9 +242,4 @@ function animateScore(score) {
 
     timer = setInterval(run, stepTime);
     run();
-}
-
-function getCookieValue(name) {
-    var value = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-    return value ? value.pop() : '';
 }

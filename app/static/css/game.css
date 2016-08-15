@@ -17,6 +17,10 @@ html, body, #map {
     text-align: center;
 }
 
+.leaflet-container {
+    cursor: crosshair;
+}
+
 .city {
     color: #e81c4f;
 }
