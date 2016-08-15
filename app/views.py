@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import render_template, request
-from flask_socketio import join_room, leave_room
+from flask_socketio import join_room
 from app import app, socketio
 from .game_master import GameMaster
 

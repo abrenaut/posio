@@ -25,7 +25,8 @@ To run the application :
 
 # TODO
 
-login 
-leaderboard
-design
-use resp time in score
+styling
+commenting
+refactoring
+use response time in score
+

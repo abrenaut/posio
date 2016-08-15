@@ -1,11 +1,17 @@
-var playerName = 'Arthur',
-    map = null,
+var map = null,
+    progressBar = null,
     markerGroup = null,
     socket = null,
-    progressbar = null,
+    playerNameStorage = 'player_name',
     gameId = 'default';
 
 $(document).ready(function () {
+
+    // Create the progress bar
+    progressBar = new ProgressBar.Line('#progress', {
+        color: '#FCB03C',
+        duration: ANSWER_DURATION * 1000
+    });
 
     // Create the leaflet map
     map = createMap();
@@ -13,12 +19,59 @@ $(document).ready(function () {
     // Create the marker group used to clear markers between turns
     markerGroup = new L.LayerGroup().addTo(map);
 
-    // Join the game
-    joinGame();
+    // Look for a previously entered player name in local storage
+    if (typeof(Storage) !== "undefined" && localStorage.getItem(playerNameStorage)) {
+
+        // If player name found, start the game using it
+        joinGame(localStorage.getItem(playerNameStorage));
+
+    } else {
+
+        // Else, ask for player name
+        getPlayerName();
+
+    }
+
 
 });
 
-function joinGame() {
+function getPlayerName() {
+
+    var loginModal = $("#loginModal").modal({
+        escapeClose: false,
+        clickClose: false,
+        showClose: false
+    });
+
+    $("#loginForm").submit(function (event) {
+
+        event.preventDefault();
+
+        var playerName = $('#playerName').val();
+
+        // Validate player name
+        if (!playerName) {
+
+            $("#loginError").text('Please select a player name.');
+
+        } else if (playerName.length > 50) {
+
+            $("#loginError").text('Player name must contain less than 50 characters.');
+
+        } else {
+
+            // Store player name and launch the game
+            localStorage.setItem(playerNameStorage, playerName);
+            $.modal.close();
+            joinGame(playerName);
+
+        }
+
+    });
+
+}
+
+function joinGame(playerName) {
 
     // Create the web socket
     socket = io.connect('//' + document.domain + ':' + location.port);
@@ -89,7 +142,7 @@ function updateLeaderboard(data) {
 
             $('#leaderboard tr:last').after('<tr class="score_row user_score"><td>' + (i + 1) + '</td><td>You</td><td>' + data.player_score + '</td></tr>');
 
-        } else if(data.top_ten[i]) {
+        } else if (data.top_ten[i]) {
 
             $('#leaderboard tr:last').after('<tr class="score_row"><td>' + (i + 1) + '</td><td>' + data.top_ten[i].player_name + '</td><td>' + data.top_ten[i].score + '</td></tr>');
 
@@ -105,10 +158,10 @@ function handleNewTurn(data) {
     markerGroup.clearLayers();
 
     // Update game rules to show the city to find
-    $('#game_rules').html('Locate <span class="city">' + data.city + '</span> (' + data.country + ')<div id="progress" class="progress"></div>');
+    $('#game_rules').html('Locate <span class="city">' + data.city + '</span> (' + data.country + ')');
 
     // Show countdown timer
-    showCountdownTimer('#progress', ANSWER_DURATION);
+    progressBar.animate(1);
 
     // Enable answers for this turn
     map.on('click', answer);
@@ -125,6 +178,9 @@ function handleEndOfTurn(data) {
 
     // Disable answers listener
     map.off('click', answer);
+
+    // Reset countdown timer
+    progressBar.set(0);
 
     // Clear markers
     markerGroup.clearLayers();
@@ -197,17 +253,6 @@ function createMarker(lat, lng, color) {
     markerGroup.addLayer(marker);
 
     return marker;
-
-}
-
-function showCountdownTimer(container, duration) {
-
-    progressbar = new ProgressBar.Line(container, {
-        color: '#FCB03C',
-        duration: duration * 1000
-    });
-
-    progressbar.animate(1);
 
 }
 
