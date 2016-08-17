@@ -22,15 +22,15 @@ html, body, #map {
 }
 
 .city {
-    color: #e81c4f;
+    color: #E81C4F;
+}
+
+.score {
+    color: #E81C4F;
 }
 
 .results {
     text-align: center;
-}
-
-.score {
-    color: #e81c4f;
 }
 
 .legend {
@@ -58,4 +58,14 @@ html, body, #map {
 .info h4 {
     margin: 0 0 5px;
     color: #777;
+}
+
+tbody tr.user_score {
+    background-color: rgba(50, 98, 149, .3);
+    color: #fff;
+    font-weight: bold;
+}
+
+#loginForm {
+    text-align: center;
 }

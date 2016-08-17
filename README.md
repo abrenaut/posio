@@ -27,6 +27,5 @@ To run the application :
 
 styling
 commenting
-refactoring
-use response time in score
+refactoring JS
 

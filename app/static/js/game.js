@@ -2,6 +2,7 @@ var map = null,
     progressBar = null,
     markerGroup = null,
     socket = null,
+    turn_start_timestamp = null,
     playerNameStorage = 'player_name',
     gameId = 'default';
 
@@ -10,7 +11,7 @@ $(document).ready(function () {
     // Create the progress bar
     progressBar = new ProgressBar.Line('#progress', {
         color: '#FCB03C',
-        duration: ANSWER_DURATION * 1000
+        duration: $('#progress').data('max-response-time') * 1000
     });
 
     // Create the leaflet map
@@ -28,65 +29,17 @@ $(document).ready(function () {
     } else {
 
         // Else, ask for player name
-        getPlayerName();
+        login();
 
     }
 
 
 });
 
-function getPlayerName() {
-
-    var loginModal = $("#loginModal").modal({
-        escapeClose: false,
-        clickClose: false,
-        showClose: false
-    });
-
-    $("#loginForm").submit(function (event) {
-
-        event.preventDefault();
-
-        var playerName = $('#playerName').val();
-
-        // Validate player name
-        if (!playerName) {
-
-            $("#loginError").text('Please select a player name.');
-
-        } else if (playerName.length > 50) {
-
-            $("#loginError").text('Player name must contain less than 50 characters.');
-
-        } else {
-
-            // Store player name and launch the game
-            localStorage.setItem(playerNameStorage, playerName);
-            $.modal.close();
-            joinGame(playerName);
-
-        }
-
-    });
-
-}
-
-function joinGame(playerName) {
-
-    // Create the web socket
-    socket = io.connect('//' + document.domain + ':' + location.port);
-
-    // Handle new turn
-    socket.on('new_turn', handleNewTurn);
-
-    // Handle leaderboard update
-    socket.on('leaderboard_update', updateLeaderboard);
-
-    // Join the default game
-    socket.emit('join_game', gameId, playerName);
-
-}
-
+/**
+ * Create the leaflet map.
+ * @returns {Array|*}
+ */
 function createMap() {
 
     // Create a world map
@@ -132,19 +85,89 @@ function createMap() {
 
 }
 
+/**
+ * Ask the player for his name and store it in local storage if possible.
+ * Once the player has entered a valid name, start the game.
+ */
+function login() {
+
+    var loginModal = $("#loginModal").modal({
+        escapeClose: false,
+        clickClose: false,
+        showClose: false
+    });
+
+    $("#loginForm").submit(function (event) {
+
+        event.preventDefault();
+
+        var playerName = $('#playerName').val();
+
+        // Validate player name
+        if (!playerName) {
+
+            $("#loginError").text('Please select a player name.');
+
+        } else if (playerName.length > 50) {
+
+            $("#loginError").text('Player name must contain less than 50 characters.');
+
+        } else {
+
+            // Store player name if possible
+            if (typeof(Storage) !== "undefined") {
+                localStorage.setItem(playerNameStorage, playerName);
+            }
+
+            // Launch the game
+            joinGame(playerName);
+
+            $.modal.close();
+
+        }
+
+    });
+
+}
+
+/**
+ * Join the game using the given player name.
+ * @param playerName
+ */
+function joinGame(playerName) {
+
+    // Create the web socket
+    socket = io.connect('//' + document.domain + ':' + location.port);
+
+    // Handle new turn
+    socket.on('new_turn', handleNewTurn);
+
+    // Handle leaderboard update
+    socket.on('leaderboard_update', updateLeaderboard);
+
+    // Join the default game
+    socket.emit('join_game', gameId, playerName);
+
+}
+
+/**
+ * Update the leaderboard to show top ten players and user rank.
+ * @param data
+ */
 function updateLeaderboard(data) {
 
+    // Remove previous scores
     $('.score_row').remove();
 
     for (var i = 0; i < 10; i++) {
 
         if (data.player_rank == i) {
 
-            $('#leaderboard tr:last').after('<tr class="score_row user_score"><td>' + (i + 1) + '</td><td>You</td><td>' + data.player_score + '</td></tr>');
+            $('#leaderboard table tr:last').after('<tr class="score_row user_score"><td>' + (i + 1) + '</td><td>You</td><td>' + data.player_score + '</td></tr>');
 
         } else if (data.top_ten[i]) {
 
-            $('#leaderboard tr:last').after('<tr class="score_row"><td>' + (i + 1) + '</td><td>' + data.top_ten[i].player_name + '</td><td>' + data.top_ten[i].score + '</td></tr>');
+            $('#leaderboard table tr:last').after('<tr class="score_row"><td>' + (i + 1) + '</td><td>' + data.top_ten[i].player_name + '</td><td>' + data.top_ten[i].score + '</td></tr>');
 
         }
 
@@ -152,6 +175,11 @@ function updateLeaderboard(data) {
 
 }
 
+/**
+ * Start a new game turn.
+ * Show the city to locate and listen for player answers.
+ * @param data
+ */
 function handleNewTurn(data) {
 
     // Clear potential markers from previous turn
@@ -172,8 +200,16 @@ function handleNewTurn(data) {
     // Handle player results
     socket.on('player_results', showPlayerResults);
 
+    // Update the timestamp indicating when the last turn started
+    turn_start_timestamp = new Date().getTime();
+
 }
 
+/**
+ * End current turn.
+ * Show best answer and correct answer for this turn.
+ * @param data
+ */
 function handleEndOfTurn(data) {
 
     // Disable answers listener
@@ -202,13 +238,19 @@ function handleEndOfTurn(data) {
 
 }
 
+/**
+ * Show player results for the last turn.
+ * @param data
+ */
 function showPlayerResults(data) {
 
+    // Place a marker to identify user answer
     var userMarker = createMarker(data.lat, data.lng, 'blue');
 
     // Show user score, ranking and distance
-    var resultsText = '<div class="results"><b>' + round(data.distance) + ' km</b> away: ';
+    var resultsText = '<div class="results"><b>' + round(data.distance) + ' km</b> away in ' + round((data.answer_duration / 1000)) + ' seconds: ';
 
+    // Show user score
     if (data.score == 0) {
         resultsText += '<span class="score">Too far away!</span>';
     } else {
@@ -226,6 +268,10 @@ function showPlayerResults(data) {
 
 }
 
+/**
+ * Send user answer to the server.
+ * @param e
+ */
 function answer(e) {
 
     // Disable answers for this turn
@@ -234,11 +280,22 @@ function answer(e) {
     // Mark the answer on the map
     createMarker(e.latlng.lat, e.latlng.lng, 'blue');
 
+    // Compute how long it took the player to answer
+    var turn_end_timestamp = new Date().getTime();
+    var answer_duration = turn_end_timestamp - turn_start_timestamp;
+
     // Emit answer event
-    socket.emit('answer', gameId, e.latlng.lat, e.latlng.lng);
+    socket.emit('answer', gameId, e.latlng.lat, e.latlng.lng, answer_duration);
 
 }
 
+/**
+ * Create a marker on the leaflet map.
+ * @param lat
+ * @param lng
+ * @param color
+ * @returns {*}
+ */
 function createMarker(lat, lng, color) {
 
     var icon = new L.Icon({
@@ -256,10 +313,19 @@ function createMarker(lat, lng, color) {
 
 }
 
+/**
+ * Round a float value to 2 decimal
+ * @param value
+ * @returns {number}
+ */
 function round(value) {
     return Math.round(value * 100) / 100
 }
 
+/**
+ * Animate user score
+ * @param score
+ */
 function animateScore(score) {
     var duration = 1000;
     // no timer shorter than 50ms (not really visible any way)

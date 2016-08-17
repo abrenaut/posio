@@ -1,54 +1,58 @@
 body {
     margin: 0 auto;
     max-width: 60em;
-    font-family: "Helvetica", "Arial", sans-serif;
+    font-family: 'Lato', Arial, sans-serif;
     line-height: 1.5;
     padding: 4em 1em;
     color: #555;
 }
 
-div.logo {
-
-}
-
-form.login  input {
-
-padding:5px;
-
-margin:5px
-
-}
-
-h2 {
-    margin-top: 1em;
-    padding-top: 1em;
+h3 {
     text-align: center;
 }
 
-h2,
-strong {
-    color: #333;
+table {
+    border-collapse: collapse;
+    line-height: 1.5em;
+    margin: 0 auto;
+    padding: 2em 0 3em;
+    width: 90%;
+    max-width: 2000px;
+    overflow: hidden;
 }
 
-.myButton {
-	background-color:#44c767;
-	-moz-border-radius:28px;
-	-webkit-border-radius:28px;
-	border-radius:28px;
-	border:1px solid #18ab29;
-	display:inline-block;
-	cursor:pointer;
-	color:#ffffff;
-	font-family:Arial;
-	font-size:17px;
-	padding:16px 31px;
-	text-decoration:none;
-	text-shadow:0px 1px 0px #2f6627;
+th {
+    background-color: #217AC9;
+    font-weight: bold;
+    color: #fff;
+    white-space: nowrap;
 }
-.myButton:hover {
-	background-color:#5cbf2a;
+
+td, th {
+    padding: 1em 1.5em;
+    text-align: left;
 }
-.myButton:active {
-	position:relative;
-	top:1px;
+
+input[type=text] {
+    padding: 0.5em 1.5em;
+    border:2px solid #ccc;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    line-height: 2em;
+    font-size: 1em;
+}
+
+input[type=submit] {
+    padding: 0.5em 1.5em;
+    background-color: #217AC9;
+    font-weight: bold;
+    color: #fff;
+    white-space: nowrap;
+
+    border:0 none;
+    cursor:pointer;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    line-height: 2em;
+    font-size: 1em;
 }
