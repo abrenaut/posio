@@ -23,9 +23,4 @@ To run the application :
     
     python run.py
 
-# TODO
-
-styling
-commenting
-refactoring JS
 
