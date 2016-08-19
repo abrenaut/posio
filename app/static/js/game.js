@@ -253,7 +253,7 @@ function showPlayerResults(data) {
         resultsText += '<span class="score">+<span id="score_value">0</span> points</span>';
     }
 
-    resultsText += '<br/>Your are <b>#' + data.rank + '</b> out of <b>' + data.total + '</b> player(s)</div>';
+    resultsText += '<br/>You are <b>#' + data.rank + '</b> out of <b>' + data.total + '</b> player(s)</div>';
 
     userMarker.bindPopup(resultsText).openPopup();
 
