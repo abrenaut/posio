@@ -244,7 +244,7 @@ function showPlayerResults(data) {
     var userMarker = createMarker(data.lat, data.lng, 'blue');
 
     // Show user score, ranking and distance
-    var resultsText = '<div class="results"><b>' + round(data.distance) + ' km</b> away in ' + round((data.answer_duration / 1000)) + ' seconds: ';
+    var resultsText = '<div class="results"><b>' + round(data.distance) + ' km</b> away: ';
 
     // Show user score
     if (data.score == 0) {
