@@ -55,7 +55,7 @@ class Game:
         # Return a different city for each turn
         return self.cities[self.turn_number % len(self.cities)]
 
-    def store_answer(self, player_sid, latitude, longitude, answer_duration):
+    def store_answer(self, player_sid, latitude, longitude):
         # Get the player corresponding to the given sid
         player = self.get_player(player_sid)
 
@@ -65,10 +65,10 @@ class Game:
             distance = self.plane_distance(current_city['latitude'], current_city['longitude'], latitude, longitude)
 
             # Compute player score for this answer
-            score = self.score(distance, answer_duration)
+            score = self.score(distance)
 
             # Store player answer
-            answer = Answer(latitude, longitude, score, distance, answer_duration)
+            answer = Answer(latitude, longitude, score, distance)
             player.add_answer(self.turn_number, answer)
 
     def get_current_turn_ranks(self):
@@ -93,15 +93,12 @@ class Game:
 
         return ranked_scores
 
-    def score(self, distance, answer_duration):
+    def score(self, distance):
         # Convert distance to a score
-        score = max(0, round(self.score_max_distance - distance))
+        score = self.score_max_distance - distance
 
-        # If user is not too far away, take into account response time
-        if score > 0:
-            score += round((1 - (answer_duration / float((self.max_response_time * 1000)))) * self.score_max_distance / 2)
-
-        return score
+        # Score cannot be negative
+        return max(0, round(score))
 
     def get_player(self, player_sid):
         player = None
@@ -167,9 +164,8 @@ class Player:
 
 
 class Answer:
-    def __init__(self, latitude, longitude, score, distance, answer_duration):
+    def __init__(self, latitude, longitude, score, distance):
         self.latitude = latitude
         self.longitude = longitude
         self.score = score
         self.distance = distance
-        self.answer_duration = answer_duration

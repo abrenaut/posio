@@ -98,7 +98,6 @@ class GameMaster:
                               'rank': rank + 1,
                               'total': player_count,
                               'distance': player.answers[game.turn_number].distance,
-                              'answer_duration': player.answers[game.turn_number].answer_duration,
                               'score': player.answers[game.turn_number].score,
                               'lat': player.answers[game.turn_number].latitude,
                               'lng': player.answers[game.turn_number].longitude

@@ -55,9 +55,9 @@ def leave_games():
 
 
 @socketio.on('answer')
-def store_answer(game_id, latitude, longitude, answer_duration):
+def store_answer(game_id, latitude, longitude):
     game = game_master.get_game(game_id)
 
     # Store new answer
     if game:
-        game.store_answer(request.sid, latitude, longitude, answer_duration)
+        game.store_answer(request.sid, latitude, longitude)

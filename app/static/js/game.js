@@ -2,7 +2,6 @@ var map = null,
     progressBar = null,
     markerGroup = null,
     socket = null,
-    turn_start_timestamp = null,
     playerNameStorage = 'player_name',
     gameId = 'default';
 
@@ -200,9 +199,6 @@ function handleNewTurn(data) {
     // Handle player results
     socket.on('player_results', showPlayerResults);
 
-    // Update the timestamp indicating when the last turn started
-    turn_start_timestamp = new Date().getTime();
-
 }
 
 /**
@@ -280,12 +276,8 @@ function answer(e) {
     // Mark the answer on the map
     createMarker(e.latlng.lat, e.latlng.lng, 'blue');
 
-    // Compute how long it took the player to answer
-    var turn_end_timestamp = new Date().getTime();
-    var answer_duration = turn_end_timestamp - turn_start_timestamp;
-
     // Emit answer event
-    socket.emit('answer', gameId, e.latlng.lat, e.latlng.lng, answer_duration);
+    socket.emit('answer', gameId, e.latlng.lat, e.latlng.lng);
 
 }
 

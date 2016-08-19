@@ -43,19 +43,19 @@ class TestGame(unittest.TestCase):
         game = Game('default', 1000, 1)
 
         # Exact match, really fast
-        score = game.score(0, 0)
-        self.assertEquals(score, 1500)
+        score = game.score(0)
+        self.assertEquals(score, 1000)
 
         # Exact match but really slow
-        score = game.score(0, 1000)
+        score = game.score(0)
         self.assertEquals(score, 1000)
 
         # 6 km away but slow
-        score = game.score(6, 500)
-        self.assertEquals(score, 1244)
+        score = game.score(6)
+        self.assertEquals(score, 994)
 
         # More than a thousand km away
-        score = game.score(1000, 500)
+        score = game.score(1000)
         self.assertEquals(score, 0)
 
     def test_get_current_turn_ranks(self):
@@ -72,9 +72,9 @@ class TestGame(unittest.TestCase):
         game.add_player('b', 'b')
         game.add_player('c', 'c')
 
-        game.store_answer('a', 48.3515609, -1.204625999999962, 0)
-        game.store_answer('b', 48.370431, -1.151591000000053, 0)
-        game.store_answer('c', 40.7127837, -74.00594130000002, 0)
+        game.store_answer('a', 48.3515609, -1.204625999999962)
+        game.store_answer('b', 48.370431, -1.151591000000053)
+        game.store_answer('c', 40.7127837, -74.00594130000002)
 
         ranked_players = game.get_current_turn_ranks()
 
@@ -99,12 +99,12 @@ class TestGame(unittest.TestCase):
         # Always return the correct answer for player a, a close answer for c and an answer far away for b
         for i in range(0, 30):
             game.start_new_turn()
-            game.store_answer('a', 48.3515609, -1.204625999999962, 0)
-            game.store_answer('b', 0, 0, 0)
-            game.store_answer('c', 48.370431, -1.151591000000053, 0)
+            game.store_answer('a', 48.3515609, -1.204625999999962)
+            game.store_answer('b', 0, 0)
+            game.store_answer('c', 48.370431, -1.151591000000053)
 
         self.assertEquals(game.get_ranked_scores()[0]['player'].sid, 'a')
         self.assertEquals(game.get_ranked_scores()[1]['player'].sid, 'c')
         self.assertEquals(game.get_ranked_scores()[2]['player'].sid, 'b')
         # Max score shouldn't be higher than 20000 because we limit to 20 turns to compute score
-        self.assertEquals(game.get_ranked_scores()[0]['score'], 30000)
+        self.assertEquals(game.get_ranked_scores()[0]['score'], 20000)
