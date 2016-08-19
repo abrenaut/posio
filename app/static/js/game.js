@@ -167,10 +167,10 @@ function updateLeaderboard(data) {
         } else if (data.top_ten[i]) {
 
             $('#leaderboard table tr:last').after( \
-                $('tr').class('score_row') \
-                .append($('td').text(i+1)) \
-                .append($('td').text(data.top_ten[i].player_name)) \
-                .append($('td').text(data.top_ten[i].score)) \
+                $('<tr>').class('score_row') \
+                .append($('<td>').text(i+1)) \
+                .append($('<td>').text(data.top_ten[i].player_name)) \
+                .append($('<td>').text(data.top_ten[i].score)) \
             );
         }
 
