@@ -166,13 +166,20 @@ function updateLeaderboard(data) {
 
         } else if (data.top_ten[i]) {
 
-            $('#leaderboard table tr:last').after( \
-                $('<tr>').class('score_row') \
-                .append($('<td>').text(i+1)) \
-                .append($('<td>').text(data.top_ten[i].player_name)) \
-                .append($('<td>').text(data.top_ten[i].score)) \
-            );
+            var row = $('<tr class="score_row">')
+                .append($('<td>').text(i+1))
+                .append($('<td>').text(data.top_ten[i].player_name))
+                .append($('<td>').text(data.top_ten[i].score))
+
+            $('#leaderboard table tr:last').after(row);
+
         }
+
+    }
+
+    if(data.player_rank >= 10) {
+
+        $('#leaderboard table tr:last').after('<tr class="score_row user_score"><td>' + (data.player_rank + 1) + '</td><td>You</td><td>' + data.player_score + '</td></tr>');
 
     }
 
