@@ -2,6 +2,7 @@ var map = null,
     progressBar = null,
     markerGroup = null,
     socket = null,
+    allowMultipleAnswer = false,
     playerNameStorage = 'player_name',
     gameId = 'default';
 
@@ -12,6 +13,8 @@ $(document).ready(function () {
         color: '#FCB03C',
         duration: $('#progress').data('max-response-time') * 1000
     });
+
+    allowMultipleAnswer = $('#game_rules').data('allow-multiple-answers')
 
     // Create the leaflet map
     map = createMap();
@@ -90,26 +93,26 @@ function createMap() {
  */
 function login() {
 
-    var loginModal = $("#loginModal").modal({
+    $("#login_modal").modal({
         escapeClose: false,
         clickClose: false,
         showClose: false
     });
 
-    $("#loginForm").submit(function (event) {
+    $("#login_form").submit(function (event) {
 
         event.preventDefault();
 
-        var playerName = $('#playerName').val();
+        var playerName = $('#player_name').val();
 
         // Validate player name
         if (!playerName) {
 
-            $("#loginError").text('Please select a player name.');
+            $("#login_error").text('Please select a player name.');
 
         } else if (playerName.length > 50) {
 
-            $("#loginError").text('Player name must contain less than 50 characters.');
+            $("#login_error").text('Player name must contain less than 50 characters.');
 
         } else {
 
@@ -167,7 +170,7 @@ function updateLeaderboard(data) {
         } else if (data.top_ten[i]) {
 
             var row = $('<tr class="score_row">')
-                .append($('<td>').text(i+1))
+                .append($('<td>').text(i + 1))
                 .append($('<td>').text(data.top_ten[i].player_name))
                 .append($('<td>').text(data.top_ten[i].score))
 
@@ -177,7 +180,7 @@ function updateLeaderboard(data) {
 
     }
 
-    if(data.player_rank >= 10) {
+    if (data.player_rank >= 10) {
 
         $('#leaderboard table tr:last').after('<tr class="score_row user_score"><td>' + (data.player_rank + 1) + '</td><td>You</td><td>' + data.player_score + '</td></tr>');
 
@@ -281,8 +284,14 @@ function showPlayerResults(data) {
  */
 function answer(e) {
 
-    // Clear previous markers
-    markerGroup.clearLayers();
+    // Clear previous markers if user is allowed to give multiple answers
+    if (allowMultipleAnswer) {
+        markerGroup.clearLayers();
+    }
+    // If user is not allowed to give multiple answer, turn off the answer listener
+    else {
+        map.off('click', answer);
+    }
 
     // Mark the answer on the map
     createMarker(e.latlng.lat, e.latlng.lng, 'blue');
