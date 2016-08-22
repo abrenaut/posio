@@ -281,8 +281,8 @@ function showPlayerResults(data) {
  */
 function answer(e) {
 
-    // Disable answers for this turn
-    map.off('click', answer);
+    // Clear previous markers
+    markerGroup.clearLayers();
 
     // Mark the answer on the map
     createMarker(e.latlng.lat, e.latlng.lng, 'blue');
