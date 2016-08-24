@@ -1,58 +1,5 @@
 body {
     margin: 0 auto;
-    max-width: 60em;
     font-family: 'Lato', Arial, sans-serif;
     line-height: 1.5;
-    padding: 4em 1em;
-    color: #555;
-}
-
-h3 {
-    text-align: center;
-}
-
-table {
-    border-collapse: collapse;
-    line-height: 1.5em;
-    margin: 0 auto;
-    padding: 2em 0 3em;
-    width: 90%;
-    max-width: 2000px;
-    overflow: hidden;
-}
-
-th {
-    background-color: #217AC9;
-    font-weight: bold;
-    color: #fff;
-    white-space: nowrap;
-}
-
-td, th {
-    padding: 1em 1.5em;
-    text-align: left;
-}
-
-input[type=text] {
-    padding: 0.5em 1.5em;
-    border:2px solid #ccc;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-    line-height: 2em;
-    font-size: 1em;
-}
-
-input[type=submit] {
-    padding: 0.5em 1.5em;
-    background-color: #217AC9;
-    font-weight: bold;
-    color: #fff;
-    white-space: nowrap;
-
-    border:0 none;
-    cursor:pointer;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-    line-height: 2em;
-    font-size: 1em;
 }

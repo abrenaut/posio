@@ -1,9 +1,51 @@
-html, body, #map {
-    height: 90%;
+html, body {
+    height: 100%;
+    color: #333;
+}
+
+#login_form {
+    text-align: center;
+    margin-top: 20px;
+}
+
+input[type=text] {
+    padding: 0.5em 1.5em;
+    border: 2px solid #ccc;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    line-height: 2em;
+    font-size: 1em;
+}
+
+input[type=submit] {
+    padding: 0.5em 1.5em;
+    background-color: #217AC9;
+    font-weight: bold;
+    color: #fff;
+    white-space: nowrap;
+    border: 0 none;
+    cursor: pointer;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    line-height: 2em;
+    font-size: 1em;
+}
+
+#map {
+    height: 100%;
+}
+
+.leaflet-container {
+    cursor: crosshair;
+    background-color: #000;
 }
 
 .progress {
-    height: 10px;
+    height: 0.3em;
+    margin-bottom: 10px;
+    position: absolute;
+    top: 0px;
+    width: 100%;
 }
 
 .progress > svg {
@@ -11,14 +53,22 @@ html, body, #map {
     display: block;
 }
 
-#game_rules {
-    color: #333;
-    height: 2em;
-    text-align: center;
+.info {
+    background: white;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    font-size: 1.4em;
+    padding: 10px;
 }
 
-.leaflet-container {
-    cursor: crosshair;
+#game_rules {
+    text-align: center;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    margin-left: -253px;
+    width: 500px;
 }
 
 .city {
@@ -33,31 +83,49 @@ html, body, #map {
     text-align: center;
 }
 
-.legend {
-    line-height: 18px;
-    color: #555;
+#leaderboard {
+    text-align: center;
+    position: absolute;
+    bottom: 20px;
+    right: 0%;
+    margin-left: -253px;
+    padding: 0px;
+    cursor: pointer;
+    width: 460px;
 }
 
-.legend i {
-    width: 18px;
-    height: 18px;
-    float: left;
-    margin-right: 8px;
-    opacity: 0.7;
+#leaderboard h1 {
+    font-size: 1em;
+    padding: 10px;
 }
 
-.info {
-    padding: 6px 8px;
-    font: 14px/16px Arial, Helvetica, sans-serif;
-    background: white;
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
+#user_rank {
+    padding: 10px;
+    font-size: 1em;
+    font-weight: bold;
 }
 
-.info h4 {
-    margin: 0 0 5px;
-    color: #777;
+#top_ten {
+    display: none;
+}
+
+table {
+    font-size: 0.8em;
+    border-collapse: collapse;
+    width: 100%;
+    overflow: hidden;
+}
+
+th {
+    background-color: #217AC9;
+    font-weight: bold;
+    color: #fff;
+    white-space: nowrap;
+}
+
+td, th {
+    padding: 1em 1em;
+    text-align: left;
 }
 
 tbody tr.user_score {
@@ -66,6 +134,36 @@ tbody tr.user_score {
     font-weight: bold;
 }
 
-#loginForm {
-    text-align: center;
+@media (max-width: 560px), (max-height: 404px) {
+
+    #game_rules {
+        left: 0;
+        margin: 0;
+        width: 100%;
+        border-radius: 0;
+    }
+
+    #leaderboard {
+        left: 0;
+        margin: 0;
+        width: 100%;
+        border-radius: 0;
+    }
+
+    .github_ribbon {
+        display: none;
+    }
+
+    .leaflet-control-zoom {
+        display: none;
+    }
+
+    #legend {
+        display: none;
+    }
+
+    .info {
+        font-size: 1.1em;
+    }
+
 }

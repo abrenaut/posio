@@ -72,6 +72,10 @@ class GameMaster:
     def end_turn(cls, game):
         app.logger.debug('Ending turn for the game {game_id}'.format(game_id=game.game_id))
 
+        # Compute score for each players once the turn is ended
+        # Avoid recomputing distances each time a user changes his answer
+        game.compute_scores()
+
         # Rank answers
         ranked_players = game.get_current_turn_ranks()
         player_count = len(ranked_players)
@@ -84,9 +88,9 @@ class GameMaster:
 
         if player_count > 0:
             turn_results['best_answer'] = {
-                'distance': ranked_players[0].answers[game.turn_number].distance,
-                'lat': ranked_players[0].answers[game.turn_number].latitude,
-                'lng': ranked_players[0].answers[game.turn_number].longitude
+                'distance': ranked_players[0].get_result(game.turn_number).distance,
+                'lat': ranked_players[0].get_answer(game.turn_number).latitude,
+                'lng': ranked_players[0].get_answer(game.turn_number).longitude
             }
 
         socketio.emit('end_of_turn', turn_results, room=game.game_id)
@@ -97,10 +101,10 @@ class GameMaster:
                           {
                               'rank': rank + 1,
                               'total': player_count,
-                              'distance': player.answers[game.turn_number].distance,
-                              'score': player.answers[game.turn_number].score,
-                              'lat': player.answers[game.turn_number].latitude,
-                              'lng': player.answers[game.turn_number].longitude
+                              'distance': player.get_result(game.turn_number).distance,
+                              'score': player.get_result(game.turn_number).score,
+                              'lat': player.get_answer(game.turn_number).latitude,
+                              'lng': player.get_answer(game.turn_number).longitude
                           },
                           room=player.sid)
 
@@ -112,10 +116,14 @@ class GameMaster:
         scores = game.get_ranked_scores()  # Extract the top ten scores
         top_ten = [{'player_name': score['player'].name, 'score': score['score']} for score in scores[:10]]
 
+        # Number of players
+        total_player = len(scores)
+
         # Send top ten + player score and rank to each player
         for rank, score in enumerate(scores):
             socketio.emit('leaderboard_update', {
                 'top_ten': top_ten,
+                'total_player': total_player,
                 'player_rank': rank,
                 'player_score': score['score']
             }, room=score['player'].sid)

@@ -76,6 +76,8 @@ class TestGame(unittest.TestCase):
         game.store_answer('b', 48.370431, -1.151591000000053)
         game.store_answer('c', 40.7127837, -74.00594130000002)
 
+        game.compute_scores()
+
         ranked_players = game.get_current_turn_ranks()
 
         self.assertEquals(ranked_players[0].sid, 'a')
@@ -102,6 +104,7 @@ class TestGame(unittest.TestCase):
             game.store_answer('a', 48.3515609, -1.204625999999962)
             game.store_answer('b', 0, 0)
             game.store_answer('c', 48.370431, -1.151591000000053)
+            game.compute_scores()
 
         self.assertEquals(game.get_ranked_scores()[0]['player'].sid, 'a')
         self.assertEquals(game.get_ranked_scores()[1]['player'].sid, 'c')

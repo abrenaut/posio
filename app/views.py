@@ -20,6 +20,12 @@ LEADERBOARD_ANSWER_COUNT = app.config.get('LEADERBOARD_ANSWER_COUNT')
 # Are players allowed to give multiple answers to the same question
 ALLOW_MULTIPLE_ANSWER = app.config.get('ALLOW_MULTIPLE_ANSWER')
 
+# How many zoom level are allowed
+ZOOM_LEVEL = min(app.config.get('ZOOM_LEVEL'), 2)
+
+# CDN Url for static ressources
+CDN_URL = app.config.get('CDN_URL')
+
 # Create the game master that manage games life cycles
 game_master = GameMaster()
 
@@ -30,7 +36,9 @@ def render_game():
     return render_template('game.html',
                            MAX_RESPONSE_TIME=MAX_RESPONSE_TIME,
                            LEADERBOARD_ANSWER_COUNT=LEADERBOARD_ANSWER_COUNT,
-                           ALLOW_MULTIPLE_ANSWER=ALLOW_MULTIPLE_ANSWER)
+                           ALLOW_MULTIPLE_ANSWER=ALLOW_MULTIPLE_ANSWER,
+                           ZOOM_LEVEL=ZOOM_LEVEL,
+                           CDN_URL=CDN_URL)
 
 
 @socketio.on('join_game')

@@ -14,7 +14,14 @@ $(document).ready(function () {
         duration: $('#progress').data('max-response-time') * 1000
     });
 
-    allowMultipleAnswer = $('#game_rules').data('allow-multiple-answers')
+    // Is user allowed answer multiple times to the same question
+    allowMultipleAnswer = $('#game_rules').data('allow-multiple-answers');
+
+    // Toggle top ten when user clicks on the leaderboard
+    $('#leaderboard').click(function () {
+        $("#top_ten").slideToggle();
+        $("#user_rank").slideToggle();
+    });
 
     // Create the leaflet map
     map = createMap();
@@ -44,18 +51,22 @@ $(document).ready(function () {
  */
 function createMap() {
 
+    // How many zoom level are allowed
+    var zoomLevel = $('#map').data('zoom-level');
+
     // Create a world map
     var map = L.map('map', {
         layers: [
-            L.tileLayer('//stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}.{ext}', {
-                attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            L.tileLayer(cdnUrl + '/tiles/{z}/{x}/{y}.png', {
+                attribution: 'Tiles generated using <a href="https://github.com/mapbox/tilemill" target="_blank">TileMill</a>',
                 noWrap: true,
                 ext: 'png'
-            })],
+            })
+        ],
+        zoomControl: zoomLevel != 0,
         zoom: 2,
-        maxZoom: 2,
+        maxZoom: 2 + zoomLevel,
         minZoom: 2,
-        zoomControl: false,
         center: [49, 2.5],
         // Force the user to stay between the given bounds
         maxBounds: [
@@ -65,19 +76,17 @@ function createMap() {
 
     });
 
-    // Disable Zoom
-    map.touchZoom.disable();
     map.doubleClickZoom.disable();
-    map.scrollWheelZoom.disable();
 
-    // Add a legend to the map
+    // Add a legend in the bottom left corner
     var legend = L.control({position: 'bottomleft'});
 
     legend.onAdd = function (map) {
-        var div = L.DomUtil.create('div', 'info legend');
-        div.innerHTML += '<img height="20" width="12" src="https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png" alt="Your answer"/> Your answer<br>';
-        div.innerHTML += '<img height="20" width="12" src="https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png" alt="Correct answer"/> Correct answer<br>';
-        div.innerHTML += '<img height="20" width="12" src="https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png" alt="Best answer"/> Closest answer<br>';
+        var div = L.DomUtil.create('div', 'info');
+        div.id = 'legend';
+        div.innerHTML += '<img height="20" width="12" src="' + cdnUrl + '/images/marker-icon-blue.png' + '" alt="Your answer"/> Your answer<br>';
+        div.innerHTML += '<img height="20" width="12" src="' + cdnUrl + '/images/marker-icon-red.png' + '" alt="Correct answer"/> Correct answer<br>';
+        div.innerHTML += '<img height="20" width="12" src="' + cdnUrl + '/images/marker-icon-green.png' + '" alt="Best answer"/> Closest answer<br>';
         return div;
     };
 
@@ -158,6 +167,12 @@ function joinGame(playerName) {
  */
 function updateLeaderboard(data) {
 
+    // Update player rank
+    $('#user_rank_value').html('(' + (data.player_rank + 1) + ' / ' + data.total_player + ' players)');
+
+    // Update player global score
+    $('#global_score_value').text(data.player_score);
+
     // Remove previous scores
     $('.score_row').remove();
 
@@ -222,6 +237,9 @@ function handleNewTurn(data) {
  */
 function handleEndOfTurn(data) {
 
+    // Reset zoom to default
+    map.setZoom(2);
+
     // Disable answers listener
     map.off('click', answer);
 
@@ -267,13 +285,13 @@ function showPlayerResults(data) {
         resultsText += '<span class="score">+<span id="score_value">0</span> points</span>';
     }
 
-    resultsText += '<br/>You are <b>#' + data.rank + '</b> out of <b>' + data.total + '</b> player(s)</div>';
+    resultsText += '<br/>You are <b>#' + data.rank + '</b> out of <b>' + data.total + '</b> player(s) for this turn</div>';
 
     userMarker.bindPopup(resultsText).openPopup();
 
     if (data.score != 0) {
-        // Animate user score
-        animateScore(data.score);
+        // Animate player score
+        animateValue('score_value', data.score);
     }
 
 }
@@ -311,8 +329,8 @@ function answer(e) {
 function createMarker(lat, lng, color) {
 
     var icon = new L.Icon({
-        iconUrl: '//cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-' + color + '.png',
-        shadowUrl: '//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconUrl: cdnUrl + '/images/marker-icon-' + color + '.png',
+        shadowUrl: cdnUrl + '/images/marker-shadow.png',
         iconAnchor: [12, 41],
         popupAnchor: [1, -34]
     });
@@ -335,15 +353,16 @@ function round(value) {
 }
 
 /**
- * Animate user score
- * @param score
+ * Animate a value
+ * @param elementID
+ * @param newValue
  */
-function animateScore(score) {
+function animateValue(elementID, newValue) {
     var duration = 1000;
     // no timer shorter than 50ms (not really visible any way)
     var minTimer = 50;
-    // calc step time to show all interediate values
-    var stepTime = Math.abs(Math.floor(duration / score));
+    // calc step time to show all intermediate values
+    var stepTime = Math.abs(Math.floor(duration / newValue));
 
     // never go below minTimer
     stepTime = Math.max(stepTime, minTimer);
@@ -356,9 +375,9 @@ function animateScore(score) {
     function run() {
         var now = new Date().getTime();
         var remaining = Math.max((endTime - now) / duration, 0);
-        var value = Math.round(score - (remaining * score));
-        $('#score_value').text(value);
-        if (value == score) {
+        var value = Math.round(newValue - (remaining * newValue));
+        $('#' + elementID).text(value);
+        if (value == newValue) {
             clearInterval(timer);
         }
     }

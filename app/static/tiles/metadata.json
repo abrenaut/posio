@@ -1,0 +1,21 @@
+{
+    "interactivity": "false", 
+    "_updated": "1471960303000", 
+    "scale": "1", 
+    "autoscale": "true", 
+    "center": "0,0,2", 
+    "format": "jpeg80", 
+    "description": "", 
+    "metatile": "2", 
+    "bounds": "-180,-85.0511,180,85.0511", 
+    "json": "{\"Stylesheet\":[{\"data\":\"Map {\\n  background-color: #000;\\n}\\n\\n@border: #000;\\n\\n#countries {\\n  ::outline {\\n    line-color: #000;\\n    line-width: 0.6;\\n    line-join: round;\\n  }\\n  line-width: 0.6;\\n  polygon-fill: #FFF;\\n}\",\"id\":\"style.mss\"}],\"Layer\":[{\"id\":\"countries\",\"name\":\"countries\",\"srs\":\"+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over\",\"geometry\":\"polygon\",\"Datasource\":{\"file\":\"/Users/arthurbrenaut/Documents/MapBox/project/Posio/layers/countries/82945364-10m-admin-0-countries.shp\",\"type\":\"shape\"}}],\"tiles\":[\"http://127.0.0.1:20008/tile/Posio/{z}/{x}/{y}.png?updated=1471960303000&metatile=2&scale=1\"],\"grids\":[\"http://127.0.0.1:20008/tile/Posio/{z}/{x}/{y}.grid.json?updated=1471960303000&metatile=2&scale=1\"]}", 
+    "srs": "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over", 
+    "minzoom": "2", 
+    "version": "1.0.0", 
+    "template": "", 
+    "maxzoom": "4", 
+    "tilejson": "2.0.0", 
+    "scheme": "xyz", 
+    "id": "Posio", 
+    "name": "Posio"
+}
