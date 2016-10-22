@@ -26,14 +26,11 @@ class GameMaster:
 
     def get_game(self, game_id):
         # Return the game matching the given game_id
-        game = None
-
         for running_game in self.games:
             if running_game.game_id == game_id:
-                game = running_game
-                break
-
-        return game
+                return running_game
+        else:
+            return None
 
     @classmethod
     def run_game(cls, game):
@@ -72,9 +69,8 @@ class GameMaster:
     def end_turn(cls, game):
         app.logger.debug('Ending turn for the game {game_id}'.format(game_id=game.game_id))
 
-        # Compute score for each players once the turn is ended
-        # Avoid recomputing distances each time a user changes his answer
-        game.compute_scores()
+        # End current turn
+        game.end_current_turn()
 
         # Rank answers
         ranked_players = game.get_current_turn_ranks()

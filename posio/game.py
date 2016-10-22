@@ -64,24 +64,23 @@ class Game:
             answer = Answer(latitude, longitude)
             player.add_answer(self.turn_number, answer)
 
-    def compute_scores(self):
+    def end_current_turn(self):
         current_city = self.get_current_city()
 
-        # For each player who have answered this turn, compute a score
-        for player in self.players:
+        # Compute scores for each players once the turn is ended instead of recomputing the score each time a user
+        # changes his answer
+        for player in [player for player in self.players if player.has_answered(self.turn_number)]:
+            # Get the distance between player answer and correct answer
+            player_answer = player.get_answer(self.turn_number)
+            distance = self.plane_distance(current_city['latitude'], current_city['longitude'],
+                                           player_answer.latitude, player_answer.longitude)
 
-            if player.has_answered(self.turn_number):
-                # Get the distance between player answer and correct answer
-                player_answer = player.get_answer(self.turn_number)
-                distance = self.plane_distance(current_city['latitude'], current_city['longitude'],
-                                               player_answer.latitude, player_answer.longitude)
+            # Compute player score for this answer
+            score = self.score(distance)
 
-                # Compute player score for this answer
-                score = self.score(distance)
-
-                # Store player result for this turn
-                result = Result(distance, score)
-                player.set_result(self.turn_number, result)
+            # Store player result for this turn
+            result = Result(distance, score)
+            player.set_result(self.turn_number, result)
 
     def get_current_turn_ranks(self):
         # Get players who have played this turn
@@ -114,14 +113,11 @@ class Game:
         return max(0, round(score))
 
     def get_player(self, player_sid):
-        player = None
-
         for existing_player in self.players:
             if existing_player.sid == player_sid:
-                player = existing_player
-                break
-
-        return player
+                return existing_player
+        else:
+            return None
 
     @staticmethod
     def get_cities():
@@ -132,12 +128,13 @@ class Game:
         c = conn.cursor()
 
         cities = []
-        for city_data in c.execute('SELECT name, country, latitude, longitude FROM cities ORDER BY RANDOM()'):
+        for name, country, latitude, longitude in c.execute(
+                'SELECT name, country, latitude, longitude FROM cities ORDER BY RANDOM()'):
             cities.append({
-                'name': city_data[0],
-                'country': city_data[1],
-                'latitude': city_data[2],
-                'longitude': city_data[3]
+                'name': name,
+                'country': country,
+                'latitude': latitude,
+                'longitude': longitude
             })
 
         # Close connection
@@ -147,7 +144,7 @@ class Game:
 
     @staticmethod
     def plane_distance(latitude1, longitude1, latitude2, longitude2):
-        # Calculates distance as points on a plane
+        # Calculates distance as points on a plane (faster than Haversine)
         px = longitude2 - longitude1
         py = latitude2 - latitude1
         return sqrt(px * px + py * py) * DISTANCE_PER_DEGREE

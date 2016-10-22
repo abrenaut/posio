@@ -11,10 +11,10 @@ LEADERBOARD_ANSWER_COUNT = 10
 SCORE_MAX_DISTANCE = 2000
 
 # Allow players to answer multiple times to the same question
-ALLOW_MULTIPLE_ANSWER = 0  # 0 for False, 1 for True
+ALLOW_MULTIPLE_ANSWER = 1  # 0 for False, 1 for True
 
 # How many zoom level are allowed (max 2)
 ZOOM_LEVEL = 0
 
-# CDN URl
+# CDN URL
 CDN_URL = 'static'
