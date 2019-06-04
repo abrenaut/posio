@@ -2,7 +2,7 @@
 MAX_RESPONSE_TIME = 5
 
 # Number of seconds between each turns
-BETWEEN_TURNS_DURATION = 3
+TIME_BETWEEN_TURNS = 3
 
 # Number of answer used to compute ranking
 LEADERBOARD_ANSWER_COUNT = 10

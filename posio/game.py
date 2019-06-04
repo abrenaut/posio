@@ -3,6 +3,11 @@
 import sqlite3
 import os
 from math import sqrt, pi
+from collections import namedtuple
+
+Answer = namedtuple('Answer', ['latitude', 'longitude'])
+Result = namedtuple('Result', ['distance', 'score'])
+
 
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 
@@ -14,35 +19,21 @@ DISTANCE_PER_DEGREE = (2 * pi * EARTH_EQUATOR) / (360 * 1000)
 
 
 class Game:
-    def __init__(self, game_id, score_max_distance=1000, max_response_time=5, leaderboard_answer_count=20,
-                 between_turns_duration=3):
-        """
-        :param game_id:
-        :param score_max_distance: The max distance above which player scores will be null
-        :param leaderboard_answer_count: How many answers are used to compute user scores in the leaderboard
-        :param max_response_time: The time given to a player to answer a question
-        :param between_turns_duration: The time between two turns
-        :return:
-        """
-        self.game_id = game_id
+    def __init__(self, score_max_distance, leaderboard_answer_count):
         self.score_max_distance = score_max_distance
         self.leaderboard_answer_count = leaderboard_answer_count
-        self.max_response_time = max_response_time
-        self.between_turns_duration = between_turns_duration
         self.cities = self.get_cities()
-        self.players = []
+        self.players = {}
         self.answers = []
         self.turn_number = 0
 
     def add_player(self, player_sid, player_name):
-        self.players.append(Player(player_sid, player_name))
+        self.players[player_sid] = Player(player_sid, player_name)
 
     def remove_player(self, player_sid):
-        # Get the player corresponding to the given sid and remove it if it is found
-        player = self.get_player(player_sid)
-
-        if player:
-            self.players.remove(player)
+        # Get the player corresponding to the given sid and remove it
+        if player_sid in self.players:
+            del self.players[player_sid]
 
     def start_new_turn(self):
         # Reset answers for this turn
@@ -57,23 +48,22 @@ class Game:
 
     def store_answer(self, player_sid, latitude, longitude):
         # Get the player corresponding to the given sid
-        player = self.get_player(player_sid)
-
-        if player:
+        if player_sid in self.players:
             # Store player answer
             answer = Answer(latitude, longitude)
-            player.add_answer(self.turn_number, answer)
+            self.players[player_sid].add_answer(self.turn_number, answer)
 
     def end_current_turn(self):
         current_city = self.get_current_city()
 
-        # Compute scores for each players once the turn is ended instead of recomputing the score each time a user
-        # changes his answer
-        for player in [player for player in self.players if player.has_answered(self.turn_number)]:
+        # Compute scores for each player
+        for player in [player for player_sid, player in self.players.items() if player.has_answered(self.turn_number)]:  # noqa
             # Get the distance between player answer and correct answer
             player_answer = player.get_answer(self.turn_number)
-            distance = self.plane_distance(current_city['latitude'], current_city['longitude'],
-                                           player_answer.latitude, player_answer.longitude)
+            distance = self.plane_distance(current_city['latitude'],
+                                           current_city['longitude'],
+                                           player_answer.latitude,
+                                           player_answer.longitude)
 
             # Compute player score for this answer
             score = self.score(distance)
@@ -84,24 +74,30 @@ class Game:
 
     def get_current_turn_ranks(self):
         # Get players who have played this turn
-        current_turn_players = [player for player in self.players if player.has_played(self.turn_number)]
+        current_turn_players = [player for player_sid, player in self.players.items() if player.has_played(self.turn_number)]  # noqa
 
         # Sort players based on their scores on this turn
-        ranked_players = sorted(current_turn_players,
-                                key=lambda current_turn_player: current_turn_player.get_result(self.turn_number).score,
-                                reverse=True)
+        ranked_players = sorted(
+            current_turn_players,
+            key=lambda player: player.get_result(self.turn_number).score,
+            reverse=True)
 
         return ranked_players
 
     def get_ranked_scores(self):
         # Get scores for each players
+        oldest_turn = self.turn_number - self.leaderboard_answer_count
         scores_by_player = {
-            player: player.get_global_score(self.turn_number - self.leaderboard_answer_count, self.turn_number)
-            for player in self.players}
+            player_sid: player.get_global_score(oldest_turn, self.turn_number)
+            for player_sid, player in self.players.items()}
 
-        # Rank the scores of players having played at least once in the last turns
-        ranked_scores = [{'player': player, 'score': scores_by_player[player]} for player in
-                         sorted(self.players, key=lambda player: scores_by_player[player], reverse=True)]
+        # Rank the scores of players
+        ranked_scores = [{
+            'player': self.players[player_sid],
+            'score': scores_by_player[player_sid]
+        } for player_sid in sorted(self.players,
+                                           key=lambda player_sid: scores_by_player[player_sid],  # noqa
+                                           reverse=True)]
 
         return ranked_scores
 
@@ -112,13 +108,6 @@ class Game:
         # Score cannot be negative
         return max(0, round(score))
 
-    def get_player(self, player_sid):
-        for existing_player in self.players:
-            if existing_player.sid == player_sid:
-                return existing_player
-        else:
-            return None
-
     @staticmethod
     def get_cities():
         # Connect to the city database
@@ -127,9 +116,10 @@ class Game:
         # Select every cities in random order
         c = conn.cursor()
 
+        c.execute('SELECT name, country, latitude, longitude FROM cities ORDER BY RANDOM()')  # noqa
+
         cities = []
-        for name, country, latitude, longitude in c.execute(
-                'SELECT name, country, latitude, longitude FROM cities ORDER BY RANDOM()'):
+        for name, country, latitude, longitude in c.fetchall():
             cities.append({
                 'name': name,
                 'country': country,
@@ -176,22 +166,10 @@ class Player:
         return self.results[turn]
 
     def get_global_score(self, start_turn, end_turn):
-        return sum(result.score for turn, result in self.results.iteritems() if start_turn < turn <= end_turn)
+        return sum(result.score for turn, result in self.results.items() if start_turn < turn <= end_turn)  # noqa
 
     def __hash__(self):
         return hash(self.sid)
 
     def __eq__(self, other):
         return self.sid == other.sid
-
-
-class Answer:
-    def __init__(self, latitude, longitude):
-        self.latitude = latitude
-        self.longitude = longitude
-
-
-class Result:
-    def __init__(self, distance, score):
-        self.distance = distance
-        self.score = score

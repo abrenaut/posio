@@ -3,8 +3,7 @@ var map = null,
     markerGroup = null,
     socket = null,
     allowMultipleAnswer = false,
-    playerNameStorage = 'player_name',
-    gameId = 'default';
+    playerNameStorage = 'player_name';
 
 $(document).ready(function () {
 
@@ -157,7 +156,7 @@ function joinGame(playerName) {
     socket.on('leaderboard_update', updateLeaderboard);
 
     // Join the default game
-    socket.emit('join_game', gameId, playerName);
+    socket.emit('join_game', playerName);
 
 }
 
@@ -315,7 +314,7 @@ function answer(e) {
     createMarker(e.latlng.lat, e.latlng.lng, 'blue');
 
     // Emit answer event
-    socket.emit('answer', gameId, e.latlng.lat, e.latlng.lng);
+    socket.emit('answer', e.latlng.lat, e.latlng.lng);
 
 }
 
