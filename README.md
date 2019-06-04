@@ -11,7 +11,7 @@ To download the project:
     git clone https://github.com/abrenaut/posio.git
     cd posio
 
-To download dependencies:
+To install dependencies:
 
     pip install -r requirements.txt
 
@@ -22,3 +22,5 @@ To override the configuration (optional):
 To run the application :
 
     python run.py
+
+Open the following URL in your browser: [http://localhost:5000](http://localhost:5000)
