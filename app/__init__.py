@@ -13,7 +13,8 @@ app.config.from_object('config')
 if 'POSIO_SETTINGS' in environ:
     app.config.from_envvar('POSIO_SETTINGS')
 
-socketio = SocketIO(app)
+cors_allowed_origins = app.config.get('CORS_ALLOWED_ORIGINS')
+socketio = SocketIO(app, cors_allowed_origins=cors_allowed_origins)
 
 from app import views  # noqa
 

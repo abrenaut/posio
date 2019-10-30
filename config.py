@@ -18,3 +18,6 @@ ZOOM_LEVEL = 0
 
 # CDN URL
 CDN_URL = 'static'
+
+# List of origins that are allowed to connect to this server.
+CORS_ALLOWED_ORIGINS = '*'
