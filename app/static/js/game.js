@@ -101,11 +101,7 @@ function createMap() {
  */
 function login() {
 
-    $("#login_modal").modal({
-        escapeClose: false,
-        clickClose: false,
-        showClose: false
-    });
+    $('#modal_background').show();
 
     $("#login_form").submit(function (event) {
 
@@ -132,7 +128,7 @@ function login() {
             // Launch the game
             joinGame(playerName);
 
-            $.modal.close();
+            $('#modal_background').hide();
 
         }
 
