@@ -21,3 +21,7 @@ CDN_URL = 'static'
 
 # List of origins that are allowed to connect to this server.
 CORS_ALLOWED_ORIGINS = '*'
+
+# Host and port the server should listen.
+HOST='127.0.0.1'
+PORT=5000
