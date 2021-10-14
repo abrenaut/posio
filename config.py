@@ -23,5 +23,5 @@ CDN_URL = 'static'
 CORS_ALLOWED_ORIGINS = '*'
 
 # Host and port the server should listen.
-HOST='127.0.0.1'
+HOST='0.0.0.0'
 PORT=5000

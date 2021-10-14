@@ -83,7 +83,7 @@ function createMap() {
     legend.onAdd = function (map) {
         var div = L.DomUtil.create('div', 'info');
         div.id = 'legend';
-        div.innerHTML += '<img src="' + cdnUrl + '/images/dot-icon-blue.png' + '" alt="Your answer"/> Your answer<br>';
+        div.innerHTML += '<img src="' + cdnUrl + '/images/marker-icon-blue.png' + '" alt="Your answer"/> Your answer<br>';
         div.innerHTML += '<img src="' + cdnUrl + '/images/marker-icon-red.png' + '" alt="Correct answer"/> Correct answer<br>';
         div.innerHTML += '<img src="' + cdnUrl + '/images/marker-icon-green.png' + '" alt="Best answer"/> Closest answer<br>';
         return div;
@@ -269,7 +269,7 @@ function handleEndOfTurn(data) {
 function showPlayerResults(data) {
 
     // Place a marker to identify user answer
-    var userMarker = createMarker(data.lat, data.lng, 'blue', 'dot');
+    var userMarker = createMarker(data.lat, data.lng, 'blue');
 
     // Show user score, ranking and distance
     var resultsText = '<div class="results"><b>' + round(data.distance) + ' km</b> away: ';
@@ -308,7 +308,7 @@ function answer(e) {
     }
 
     // Mark the answer on the map
-    createMarker(e.latlng.lat, e.latlng.lng, 'blue', 'dot');
+    createMarker(e.latlng.lat, e.latlng.lng, 'blue');
 
     // Emit answer event
     socket.emit('answer', e.latlng.lat, e.latlng.lng);
@@ -322,28 +322,13 @@ function answer(e) {
  * @param color
  * @returns {*}
  */
-function createMarker(lat, lng, color, type) {
-
-    if (!type) {
-        type = 'marker';
-    }
-
-    var iconOptions = {
-        iconUrl: cdnUrl + '/images/' + type + '-icon-' + color + '.png',
+function createMarker(lat, lng, color) {
+    var icon = new L.Icon({
+        iconUrl: cdnUrl + '/images/marker-icon-' + color + '.png',
+        shadowUrl: cdnUrl + '/images/marker-shadow.png',
+        iconAnchor: [12, 41],
         popupAnchor: [1, -34]
-    };
-
-    if ('marker' === type) {
-        iconOptions.shadowUrl = cdnUrl + '/images/marker-shadow.png';
-        iconOptions.iconAnchor = [12, 41];
-    }
-
-    if ('dot' === type) {
-        iconOptions.iconAnchor = [8, 10];
-        iconOptions.iconSize = [16, 16];
-    }
-
-    var icon = new L.Icon(iconOptions);
+    });
 
     var marker = L.marker([lat, lng], {icon: icon}).addTo(map);
 
