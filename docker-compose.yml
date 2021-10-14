@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+    python:
+        build: .
+        volumes:
+            - .:/posio
+        working_dir: /posio
+        ports:
+            - 5000:5000
+        command: sh -c "pip install -r requirements.txt && POSIO_SETTINGS=/posio/docker/python/config.py python run.py"
