@@ -19,6 +19,10 @@
       - python3-dev
       - python3-venv
       - nginx
+  - name: Install virtualenv via pip
+    pip:
+      name: virtualenv
+      executable: pip3
 
 # Install the app
 - hosts: all
