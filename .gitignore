@@ -93,3 +93,5 @@ test_config.py
 
 # Ansible
 ansible/inventory.ini
+
+.venv
