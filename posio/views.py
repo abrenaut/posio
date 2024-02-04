@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from flask import render_template, request
-from app import app, socketio
-from .game_master import GameMaster
+
+from posio import app, socketio
+from posio.game_master import GameMaster
 
 # The max distance used to compute players score
 SCORE_MAX_DISTANCE = app.config.get('SCORE_MAX_DISTANCE')
@@ -61,4 +62,5 @@ def leave_games():
 
 @socketio.on('answer')
 def store_answer(latitude, longitude):
+    game_master.game.store_answer(request.sid, latitude, longitude)
     game_master.game.store_answer(request.sid, latitude, longitude)

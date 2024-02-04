@@ -1,28 +1,31 @@
 {% extends "layout.html" %}
 {% block head %}
     {{ super() }}
-    <link href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" rel="stylesheet"/>
-    <link href="/static/css/game.css" rel="stylesheet">
+
+    <!-- Leaflet JS and CSSfor map -->
+    <script src="/static/js/leaflet.js"></script>
+    <link href="/static/css/leaflet.css" rel="stylesheet"/>
+
+    <!-- Socket.io -->
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js" type="text/javascript"></script>
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
     <script src="//cdn.rawgit.com/kimmobrunfeldt/progressbar.js/1.0.1/dist/progressbar.min.js"></script>
+
+    <!-- Posio JS and CSS code -->
+    <link href="/static/css/game.css" rel="stylesheet">
+    <script src="/static/js/game.js"></script>
+
     <script>
         var cdnUrl = '{{ CDN_URL }}';
     </script>
-    <script src="/static/js/game.js"></script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 {% endblock %}
 {% block content %}
 
     <!-- Leaflet map -->
     <div id="map" data-zoom-level="{{ ZOOM_LEVEL }}"></div>
-
-    <!-- Github ribbon -->
-    <a class="github_ribbon" href="https://github.com/abrenaut"><img style="position: absolute; top: 0; right: 0; border: 0;"
-                                          src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67"
-                                          alt="Fork me on GitHub"
-                                          data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"></a>
 
     <!-- Progress bar -->
     <div id="progress" class="progress" data-max-response-time="{{ MAX_RESPONSE_TIME }}"></div>
