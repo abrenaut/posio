@@ -132,7 +132,12 @@ class Game:
 
     @staticmethod
     def plane_distance(latitude1, longitude1, latitude2, longitude2):
-        # Calculates distance as points on a plane (faster than Haversine)
+        """
+        Calculates the distance between two points on a plane.
+        We use a simple plane distance calculation instead of the Haversine formula
+        because we don't need the accuracy of the Haversine formula and the plane
+        distance is much faster to compute.
+        """
         px = longitude2 - longitude1
         py = latitude2 - latitude1
         return sqrt(px * px + py * py) * DISTANCE_PER_DEGREE
