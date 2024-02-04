@@ -6,35 +6,28 @@ Visit [https://posio.abrenaut.com/](https://posio.abrenaut.com/) for a live demo
 
 ![Screenshot](screenshot.png)
 
-## Developing
+## Quick start
 
-To download the project:
+1. Create a new [virtual environment](https://docs.python.org/3/library/venv.html) and activate it
 
-    git clone https://github.com/abrenaut/posio.git
-    cd posio
+```
+python -m venv .venv
+source .venv/bin/activate
+```
 
-To install dependencies:
+2. Install dependencies
 
-    pip install -r requirements.txt
+```
+pip install -r requirements.txt
+```
 
-To override the configuration (optional):
+3. Run the application
 
-    export POSIO_SETTINGS=/path/to/config.py
+```
+flask --app posio run
+```
 
-To run the application :
-
-    python run.py
-
-Open the following URL in your browser: [http://localhost:5000](http://localhost:5000)
-
-### Using Docker
-
-Run:
-
-    docker-compose up
-
-Wait until the environment builds and server is listening,
-then go to <http://localhost:5000>.
+4. Open the following URL in your browser: [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ## License
 

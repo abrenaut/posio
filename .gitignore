@@ -92,4 +92,6 @@ ENV/
 test_config.py
 
 # Ansible
-ansible/inventory.ini
+infrastructure/ansible/inventory.ini
+
+.venv

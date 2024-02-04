@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-
-import sqlite3
 import os
-from math import sqrt, pi
+import sqlite3
 from collections import namedtuple
+from math import pi, sqrt
 
 Answer = namedtuple('Answer', ['latitude', 'longitude'])
 Result = namedtuple('Result', ['distance', 'score'])
