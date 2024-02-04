@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from flask import render_template, request
 
 from posio import app, socketio
@@ -23,9 +21,6 @@ ALLOW_MULTIPLE_ANSWER = app.config.get('ALLOW_MULTIPLE_ANSWER')
 # How many zoom level are allowed
 ZOOM_LEVEL = min(app.config.get('ZOOM_LEVEL'), 2)
 
-# CDN Url for static ressources
-CDN_URL = app.config.get('CDN_URL')
-
 # Create the game master and start the game
 game_master = GameMaster(SCORE_MAX_DISTANCE,
                          LEADERBOARD_ANSWER_COUNT,
@@ -41,8 +36,7 @@ def render_game():
                            MAX_RESPONSE_TIME=MAX_RESPONSE_TIME,
                            LEADERBOARD_ANSWER_COUNT=LEADERBOARD_ANSWER_COUNT,
                            ALLOW_MULTIPLE_ANSWER=ALLOW_MULTIPLE_ANSWER,
-                           ZOOM_LEVEL=ZOOM_LEVEL,
-                           CDN_URL=CDN_URL)
+                           ZOOM_LEVEL=ZOOM_LEVEL)
 
 
 @socketio.on('join_game')

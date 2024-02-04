@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import logging
 from os import environ
 
@@ -7,7 +5,7 @@ from flask import Flask
 from flask_socketio import SocketIO
 
 app = Flask(__name__)
-app.config.from_object('config')
+app.config.from_object('posio.config')
 
 # Override config if needed
 if 'POSIO_SETTINGS' in environ:

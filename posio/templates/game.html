@@ -3,8 +3,8 @@
     {{ super() }}
 
     <!-- Leaflet JS and CSSfor map -->
-    <script src="/static/js/leaflet.js"></script>
-    <link href="/static/css/leaflet.css" rel="stylesheet"/>
+    <script src="{{ url_for('static', filename='js/leaflet.js') }}"></script>
+    <link href="{{ url_for('static', filename='css/leaflet.css') }}" rel="stylesheet"/>
 
     <!-- Socket.io -->
     <script src="https://cdn.socket.io/4.7.4/socket.io.min.js" type="text/javascript"></script>
@@ -13,11 +13,11 @@
     <script src="//cdn.rawgit.com/kimmobrunfeldt/progressbar.js/1.0.1/dist/progressbar.min.js"></script>
 
     <!-- Posio JS and CSS code -->
-    <link href="/static/css/game.css" rel="stylesheet">
-    <script src="/static/js/game.js"></script>
+    <link href="{{ url_for('static', filename='css/game.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
 
     <script>
-        var cdnUrl = '{{ CDN_URL }}';
+        const STATIC_ROOT = "{{ url_for('static', filename='') }}"
     </script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>

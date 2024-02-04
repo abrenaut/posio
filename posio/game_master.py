@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from posio import app, socketio
 from posio.game import Game
 
