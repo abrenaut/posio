@@ -4,11 +4,11 @@ server {
 
     location / {
         include proxy_params;
-        proxy_pass http://127.0.0.1:5000;
+        proxy_pass http://127.0.0.1:8000;
     }
 
     location /static {
-        alias /home/{{ ansible_ssh_user }}/posio/app/static;
+        alias /home/{{ ansible_ssh_user }}/posio/posio/static;
         expires 30d;
     }
 
@@ -18,6 +18,6 @@ server {
         proxy_buffering off;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
-        proxy_pass http://127.0.0.1:5000/socket.io;
+        proxy_pass http://127.0.0.1:8000/socket.io;
     }
 }
