@@ -1,0 +1,6 @@
+services:
+  posio:
+    container_name: posio
+    build: .
+    ports: 
+      - "5000:5000"

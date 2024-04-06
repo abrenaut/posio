@@ -1,0 +1,6 @@
+.git/
+.gitignore
+Dockerfile
+LICENSE.txt
+README.md
+screenshot.png
