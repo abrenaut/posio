@@ -1,0 +1,20 @@
+<div id="question">
+    <div class="question-label">{{ question_label }}</div>
+    {% if question_image_url %}
+        <div class="question-image">
+            <img src="{{ question_image_url }}" alt="Question image" />
+        </div>
+    {% endif %}
+    <div class="progress-bar">
+        <div class="progress-bar-fill"></div>
+    </div>
+</div>
+<div id="player-answer-popup"></div>
+<div id="correct-answer-popup"></div>
+<input id="correct-answer" name="correct-answer" value="" type="hidden">
+<input id="player-answer" name="player-answer" value="" type="hidden">
+<input id="top-answer" name="top-answer" value="" type="hidden">
+<input id="question-in-progress"
+       name="question-in-progress"
+       value="true"
+       type="hidden">

@@ -1,0 +1,53 @@
+<div id="question">Waiting for next question</div>
+<div id="leaderboard-header">
+       {{ player_score }} points
+       {% if player_rank %}({{ player_rank }} / {{ player_count }}){% endif %}
+</div>
+<div id="leaderboard-table">{% include 'game/leaderboard.html' with leaderboard=leaderboard %}</div>
+<div id="correct-answer-popup">
+       {% if answer_label %}
+              <div class="correct-answer-label">{{ answer_label }}</div>
+              {% if question_image_url %}
+                     <div class="correct-answer-image">
+                            <img src="{{ question_image_url }}"
+                                 alt="Question image"
+                                 width="50"
+                                 height="50" />
+                     </div>
+              {% endif %}
+       {% endif %}
+</div>
+<div id="player-answer-popup" class="hidden">
+       <div class="player-results">
+              {% if last_question_player_distance_km == 0 %}
+                     <b>Spot on!</b>
+              {% else %}
+                     <b>{{ last_question_player_distance_km }}km</b> away:
+              {% endif %}
+              <span class="player-score">
+                     {% if last_question_player_score == 0 %}
+                            Too far away!
+                     {% else %}
+                            +<span id="player-score-value">{{ last_question_player_score }}</span> points
+                     {% endif %}
+              </span>
+              <br />
+              You are <b>{{ last_question_player_rank }}</b> out of <b>{{ last_question_answers_count }}</b> player(s) for this turn
+       </div>
+</div>
+<input id="correct-answer"
+       name="correct-answer"
+       value="{{ answer_json }}"
+       type="hidden">
+<input id="player-answer"
+       name="player-answer"
+       value="{{ player_answer_json }}"
+       type="hidden">
+<input id="top-answer"
+       name="top-answer"
+       value="{{ top_answer_json }}"
+       type="hidden">
+<input id="question-in-progress"
+       name="question-in-progress"
+       value="false"
+       type="hidden">

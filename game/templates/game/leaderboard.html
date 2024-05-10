@@ -1,0 +1,26 @@
+<table class="leaderboard-table">
+        <caption>
+        Leaderboard based on the last {{ leaderboard_answer_count }} turns
+        </caption>
+        <thead>
+                <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Score</th>
+                </tr>
+        </thead>
+        <tbody>
+                {% for row in leaderboard %}
+                        <tr {% if row.is_player and leaderboard|length > 1 %}class="player-row"{% endif %}>
+                                <td>{{ row.rank }}</td>
+                                <td>{{ row.username }}</td>
+                                <td>{{ row.score }}</td>
+                        </tr>
+                {% empty %}
+                        <tr>
+                                <td colspan="3">--</td>
+                        </tr>
+                {% endfor %}
+
+        </tbody>
+</table>

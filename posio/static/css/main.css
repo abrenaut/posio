@@ -1,9 +1,0 @@
-html {
-    touch-action: manipulation;
-    -ms-touch-action: manipulation;
-}
-body {
-    margin: 0 auto;
-    font-family: 'Lato', Arial, sans-serif;
-    line-height: 1.5;
-}
