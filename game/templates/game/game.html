@@ -1,0 +1,102 @@
+{% load static %}
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ game.description }}">
+    <title>Posio - {{ game.title }}</title>
+    <script src="https://unpkg.com/htmx.org@1.9.12"
+            integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2"
+            crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/ws.js"></script>
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+    <link rel="stylesheet" href="{% static 'game/css/game.css' %}">
+</head>
+<body>
+    {% if show_player_creation_form %}
+        <div id="create-player-form-container">
+            <form class="create-player-form" method="post" action="{% url 'player' %}">
+                {% csrf_token %}
+                <h2 for="username">Enter your player name:</h2>
+                <input type="text"
+                       placeholder="Player name"
+                       name="username"
+                       value="{{ player.username }}" />
+                <h2>Select a game:</h2>
+                {% for game in game_choices %}
+                    <button type="submit" name="game_slug" value="{{ game.slug }}">Play {{ game.name }} game</button>
+                {% endfor %}
+            </form>
+        </div>
+    {% endif %}
+    <div id="game-container"
+         {% if show_player_creation_form %}class="blurred"{% endif %}
+         ws-send
+         hx-trigger="game:answer"
+         hx-vals='js:{latitude: event.detail.latitude, longitude: event.detail.longitude}'
+         hx-ext="ws"
+         ws-connect="/ws/game/{{ game.id }}/"
+         hx-swap-oob="true">
+        {{ game.time_to_answer_question.total_seconds|json_script:"time-to-answer-question" }}
+        <div id="map"></div>
+        <div id="question">
+            <div class="question-label">{{ game.instructions }}</div>
+        </div>
+        <div id="leaderboard">
+            <div id="leaderboard-header">Leaderboard</div>
+            <div id="leaderboard-table-container" class="hidden">
+                <div id="leaderboard-table">{% include 'game/leaderboard.html' %}</div>
+            </div>
+        </div>
+        <div id="legend">
+            <div>
+                <span class="red-dot"></span> Correct answer
+            </div>
+            <div>
+                <span class="blue-dot"></span> Your answer
+            </div>
+            <div>
+                <span class="green-dot"></span> Top answer
+            </div>
+        </div>
+        <div id="player-answer-popup"></div>
+        <div id="correct-answer-popup"></div>
+        <input id="correct-answer" name="correct-answer" value="" type="hidden">
+        <input id="player-answer" name="player-answer" value="" type="hidden">
+        <input id="top-answer" name="top-answer" value="" type="hidden">
+        <input id="question-in-progress"
+               name="question-in-progress"
+               value="false"
+               type="hidden">
+        <img id="blue-marker-icon"
+             src="{% static 'game/images/marker-icon-blue.png' %}"
+             width="0"
+             height="0"
+             alt=""
+             class="hidden">
+        <img id="red-marker-icon"
+             src="{% static 'game/images/marker-icon-red.png' %}"
+             width="0"
+             height="0"
+             alt=""
+             class="hidden">
+        <img id="green-marker-icon"
+             src="{% static 'game/images/marker-icon-green.png' %}"
+             width="0"
+             height="0"
+             alt=""
+             class="hidden">
+        <img id="shadow-marker"
+             src="{% static 'game/images/marker-shadow.png' %}"
+             width="0"
+             height="0"
+             alt=""
+             class="hidden">
+    </div>
+    <script src="{% static 'game/js/game.js' %}"></script>
+</body>

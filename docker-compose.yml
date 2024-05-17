@@ -1,0 +1,30 @@
+x-app: &default-app
+  build:
+    context: "."
+  depends_on:
+    - "redis"
+  volumes:
+    - .:/app
+    - spatialite:/app/db
+  environment:
+    - REDIS_HOST=redis
+
+services:
+  redis:
+    image: "redis:7.2.4-bookworm"
+    volumes:
+      - "redis:/data"
+
+  web:
+    <<: *default-app
+    ports:
+      - "8000:8000"
+    command: ["manage.py", "runserver", "0.0.0.0:8000"]
+
+  gameloops:
+    <<: *default-app
+    command: ["manage.py", "startgameloops"]
+
+volumes:
+  spatialite: {}
+  redis: {}

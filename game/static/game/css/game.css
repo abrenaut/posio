@@ -1,0 +1,278 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Lato', Arial, sans-serif;
+}
+
+.hidden {
+    display: none;
+}
+
+.blurred {
+    filter: blur(4px);
+    pointer-events: none;
+}
+
+#map {
+    height: 100%;
+}
+
+.leaflet-container {
+    cursor: crosshair;
+    background: rgb(213, 231, 235);
+}
+
+#create-player-form-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    width: 400px;
+    padding: 10px;
+    background: #fff;
+    box-shadow: 0 0 4px #000;
+    border-radius: 5px;
+}
+
+.create-player-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.create-player-form h2 {
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 1em;
+    margin: 10px 0 0 0;
+}
+
+.create-player-form input[type=text] {
+    padding: 0.3em 0.5em;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    line-height: 2em;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.create-player-form button {
+    padding: 0.3em 0.5em;
+    background-color: rgb(49, 128, 201);
+    font-weight: bold;
+    color: #fff;
+    border: 0 none;
+    cursor: pointer;
+    border-radius: 5px;
+    line-height: 2em;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.create-player-form button:hover {
+    background-color: rgb(39, 108, 181);
+}
+
+#question {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+    margin-left: -250px;
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.question-label {
+    text-align: center;
+}
+
+.question-image {
+    height: 100px;
+    margin: 0 auto;
+    z-index: 2000;
+}
+
+.question-image img {
+    width: 100%;
+    height: 100%;
+    transition: all .3s ease;
+    margin: 0 auto;
+}
+
+.question-image img:hover, .question-image img:active {
+    transform: scale(2.5);
+    padding-top: 50px;
+}
+
+.progress-bar {
+    height: 0.4em;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+
+.progress-bar-fill {
+    background-size: 23em 0.25em;
+    height: 100%;
+    position: relative;
+    background-color: #e04542;
+}
+
+/* Progress bar animation */
+@keyframes cssload-width {
+
+    0%,
+    100% {
+        transition-timing-function: linear;
+    }
+
+    0% {
+        width: 0;
+    }
+
+    100% {
+        width: 100%;
+    }
+}
+
+.correct-answer-label {
+    text-align: center;
+}
+
+.correct-answer-image {
+    text-align: center;
+}
+
+.player-score {
+    color: #E81C4F;
+}
+
+.player-results {
+    text-align: center;
+}
+
+#leaderboard {
+    position: absolute;
+    bottom: 25px;
+    right: 10px;
+    background-color: white;
+    border-radius: 5px;
+    z-index: 1000;
+    width: 300px;
+    text-align: center;
+}
+
+#leaderboard-header {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 10px;
+}
+
+.leaderboard-table {
+    border-top: 1px solid #ccc;
+    font-size: 0.9em;
+    border-collapse: collapse;
+    width: 100%;
+    overflow: hidden;
+}
+
+.leaderboard-table {
+    caption-side: bottom;
+}
+
+.leaderboard-table caption {
+    font-style: italic;
+}
+
+.leaderboard-table th {
+    font-weight: bold;
+    white-space: nowrap;
+    background-color: rgb(49, 128, 201);
+    color: white;
+}
+
+.leaderboard-table td,
+th {
+    padding: 1em 1em;
+    text-align: left;
+}
+
+.leaderboard-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.leaderboard-table tr.player-row {
+    background-color: rgba(50, 98, 149, .3);
+    color: #fff;
+    font-weight: bold;
+}
+
+#legend {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+.green-dot,
+.blue-dot,
+.red-dot {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.green-dot {
+    background-color: rgb(46, 169, 41);
+}
+
+.blue-dot {
+    background-color: rgb(49, 128, 201);
+}
+
+.red-dot {
+    background-color: rgb(195, 56, 74);
+
+}
+
+@media (max-width: 560px),
+(max-height: 404px) {
+
+    #question {
+        left: 0;
+        margin: 0;
+        width: 100%;
+        border-radius: 0;
+    }
+
+    #leaderboard {
+        left: 0;
+        margin: 0;
+        width: 100%;
+        border-radius: 0;
+    }
+
+    #create-player-form-container {
+        left: 10px;
+        width: 90%;
+        transform: translate(0, -50%);
+    }
+
+    #legend {
+        display: none;
+    }
+}
