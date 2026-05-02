@@ -1,4 +1,7 @@
-<div id="question">Waiting for next question</div>
+<div id="question">
+    <div class="status-showing">Showing results</div>
+    <div class="status-waiting hidden">Waiting for next question</div>
+</div>
 <div id="leaderboard-header">
        {{ player_score }} points
        {% if player_rank %}({{ player_rank }} / {{ player_count }}){% endif %}

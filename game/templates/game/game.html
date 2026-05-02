@@ -43,6 +43,7 @@
          ws-connect="/ws/game/{{ game.id }}/"
          hx-swap-oob="true">
         {{ game.time_to_answer_question.total_seconds|json_script:"time-to-answer-question" }}
+        {{ game.time_between_questions.total_seconds|json_script:"time-between-questions" }}
         <div id="map"></div>
         <div id="question">
             <div class="question-label">{{ game.instructions }}</div>
