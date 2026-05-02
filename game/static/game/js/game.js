@@ -2,9 +2,14 @@
  * Initialize game variables.
  */
 let gameStarted = false;
+let statusTimer = null;
 
 const timeToAnswerQuestion = JSON.parse(
   document.getElementById("time-to-answer-question").textContent
+);
+
+const timeBetweenQuestions = JSON.parse(
+  document.getElementById("time-between-questions").textContent
 );
 
 const gameContainer = document.getElementById("game-container");
@@ -173,22 +178,42 @@ document.body.addEventListener("click", (evt) => {
 });
 
 document.body.addEventListener("htmx:wsAfterMessage", () => {
+  if (statusTimer) {
+    clearTimeout(statusTimer);
+    statusTimer = null;
+  }
+
   if (isQuestionInProgress()) {
     gameStarted = true;
-    // If the user is on a mobile device, reset the map view
     if (isMobileViewport()) {
       map.setView([20, 0], 2);
     }
     animateProgressBar();
+  } else {
+    const resultsStatus = document.querySelector(".game-status-results");
+    const waitingStatus = document.querySelector(".game-status-waiting");
+
+    if (resultsStatus && waitingStatus) {
+      resultsStatus.classList.remove("hidden");
+      waitingStatus.classList.add("hidden");
+
+      const switchDelay = Math.max(
+        (timeBetweenQuestions * 1000) / 2,
+        500
+      );
+
+      statusTimer = setTimeout(() => {
+        resultsStatus.classList.add("hidden");
+        waitingStatus.classList.remove("hidden");
+      }, switchDelay);
+    }
   }
 
   if (gameStarted) {
-    // Update the GeoJSON layers with the latest data
     updateGeoJSONLayerFromInput(topAnswerLayer, "top-answer");
     updateGeoJSONLayerFromInput(correctAnswerLayer, "correct-answer");
     updateGeoJSONLayerFromInput(playerAnswerLayer, "player-answer");
 
-    // Show the player's turn result popup
     playerAnswerLayer.unbindPopup();
     const playerMarkerPopupContent = document.querySelector(
       "#player-answer-popup"
@@ -196,7 +221,6 @@ document.body.addEventListener("htmx:wsAfterMessage", () => {
     if (playerMarkerPopupContent) {
       playerAnswerLayer.bindPopup(playerMarkerPopupContent).openPopup();
 
-      // Animate the player score
       const playerScoreValueElement =
         document.getElementById("player-score-value");
       if (playerScoreValueElement) {
@@ -204,7 +228,6 @@ document.body.addEventListener("htmx:wsAfterMessage", () => {
       }
     }
 
-    // Show the correct answer tooltip if any
     correctAnswerLayer.unbindTooltip();
     const correctAnswerPopupContent = document.querySelector(
       "#correct-answer-popup"
@@ -213,7 +236,6 @@ document.body.addEventListener("htmx:wsAfterMessage", () => {
       correctAnswerLayer.bindTooltip(correctAnswerPopupContent).openTooltip();
     }
 
-    // If the user is on a mobile device, zoom on the correct answer.
     if (isMobileViewport() && !isQuestionInProgress()) {
       map.fitBounds(correctAnswerLayer.getBounds());
     }
