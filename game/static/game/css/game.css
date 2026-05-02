@@ -94,17 +94,7 @@ body {
     text-align: center;
 }
 
-.game-status-question {
-    color: rgb(49, 128, 201);
-}
 
-.game-status-results {
-    color: rgb(46, 169, 41);
-}
-
-.game-status-waiting {
-    color: rgb(195, 56, 74);
-}
 
 .question-image {
     height: 100px;

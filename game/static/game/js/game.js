@@ -190,8 +190,8 @@ document.body.addEventListener("htmx:wsAfterMessage", () => {
     }
     animateProgressBar();
   } else {
-    const resultsStatus = document.querySelector(".game-status-results");
-    const waitingStatus = document.querySelector(".game-status-waiting");
+    const resultsStatus = document.querySelector(".status-showing");
+    const waitingStatus = document.querySelector(".status-waiting");
 
     if (resultsStatus && waitingStatus) {
       resultsStatus.classList.remove("hidden");
